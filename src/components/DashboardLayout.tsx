@@ -13,6 +13,8 @@ import {
   LogOut,
   Menu,
   X,
+  Settings,
+  BarChart3,
 } from "lucide-react";
 import { useState } from "react";
 import type { SessionUser } from "@/lib/types";
@@ -33,6 +35,8 @@ export function DashboardLayout({ user, children }: DashboardLayoutProps) {
     { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard"), show: true },
     { href: "/dashboard/candidates", icon: UserCircle, label: t("candidates"), show: true },
     { href: "/dashboard/links", icon: Link2, label: t("inviteLinks"), show: hasPermission(user.role, "create_links") },
+    { href: "/dashboard/reports", icon: BarChart3, label: t("reports"), show: hasPermission(user.role, "view_reports") },
+    { href: "/dashboard/settings", icon: Settings, label: t("fieldSettings"), show: hasPermission(user.role, "manage_settings") },
     { href: "/dashboard/users", icon: Users, label: t("users"), show: hasPermission(user.role, "manage_users") },
   ];
 
@@ -66,8 +70,8 @@ export function DashboardLayout({ user, children }: DashboardLayoutProps) {
       >
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-between p-5 border-b border-white/10">
-            <div className="rounded-lg bg-white/10 p-2 ring-1 ring-white/20">
-              <LotusLogo variant="white" className="h-8 w-auto" width={140} height={36} />
+            <div className="rounded-lg bg-white p-2">
+              <LotusLogo variant="official" className="h-14 w-auto" width={56} height={56} />
             </div>
             <button
               onClick={() => setSidebarOpen(false)}

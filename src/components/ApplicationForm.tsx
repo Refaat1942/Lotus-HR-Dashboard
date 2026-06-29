@@ -13,6 +13,8 @@ import {
   PROFICIENCY_LEVELS,
 } from "@/lib/constants";
 import type { Candidate, WorkExperience, TrainingCourse } from "@/lib/types";
+import { isFieldVisible, isSectionVisible } from "@/lib/fieldConfig";
+import { HrExtras } from "./HrExtras";
 import { Plus, Trash2 } from "lucide-react";
 
 interface ApplicationFormProps {
@@ -20,6 +22,7 @@ interface ApplicationFormProps {
   onChange: (data: Partial<Candidate>) => void;
   readOnly?: boolean;
   showHrSection?: boolean;
+  fieldVisibility?: Record<string, boolean>;
 }
 
 function FormField({
@@ -99,8 +102,11 @@ function YesNoField({
   );
 }
 
-export function ApplicationForm({ data, onChange, readOnly = false, showHrSection = false }: ApplicationFormProps) {
+export function ApplicationForm({ data, onChange, readOnly = false, showHrSection = false, fieldVisibility }: ApplicationFormProps) {
   const { t, locale } = useLanguage();
+
+  const visible = (key: string) => showHrSection || !fieldVisibility || isFieldVisible(key, fieldVisibility);
+  const sectionVisible = (section: string) => showHrSection || !fieldVisibility || isSectionVisible(section, fieldVisibility);
 
   function update(field: string, value: unknown) {
     onChange({ ...data, [field]: value });
@@ -156,9 +162,11 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
   return (
     <div className="space-y-6">
       {/* Header */}
+      {sectionVisible("header") && (
       <div className="form-section">
         <div className="section-header">{t("jobApplicationForm")}</div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
+          {visible("positionAppliedFor") && (
           <FormField label={t("positionAppliedFor")} required>
             <input
               type="text"
@@ -168,6 +176,8 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
               className="input-field"
             />
           </FormField>
+          )}
+          {visible("applicationDate") && (
           <FormField label={t("applicationDate")}>
             <input
               type="date"
@@ -177,6 +187,8 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
               className="input-field"
             />
           </FormField>
+          )}
+          {visible("applicationNumber") && (
           <FormField label={t("applicationNumber")}>
             <input
               type="text"
@@ -185,10 +197,13 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
               className="input-field bg-gray-50"
             />
           </FormField>
+          )}
         </div>
       </div>
+      )}
 
       {/* Personal Data */}
+      {sectionVisible("personal") && (
       <div className="form-section">
         <div className="section-header">{t("personalData")}</div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
@@ -261,12 +276,15 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
               {selectOptions.militaryStatus.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </FormField>
+          {visible("pharmacistAssignmentStatus") && (
           <FormField label={t("pharmacistAssignment")}>
             <input type="text" value={data.pharmacistAssignmentStatus || ""} onChange={(e) => update("pharmacistAssignmentStatus", e.target.value)} disabled={readOnly} className="input-field" />
           </FormField>
+          )}
         </div>
 
         {/* Delivery fields */}
+        {sectionVisible("delivery") && (
         <div className="border-t border-gray-200 p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-3">
@@ -297,9 +315,12 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
             </div>
           </div>
         </div>
+        )}
       </div>
+      )}
 
       {/* Previous Experience */}
+      {sectionVisible("experience") && (
       <div className="form-section">
         <div className="section-header flex items-center justify-between">
           <span>{t("previousExperience")}</span>
@@ -341,8 +362,10 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
           ))}
         </div>
       </div>
+      )}
 
       {/* Training Courses */}
+      {sectionVisible("training") && (
       <div className="form-section">
         <div className="section-header flex items-center justify-between">
           <span>{t("trainingCourses")}</span>
@@ -378,8 +401,10 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
           ))}
         </div>
       </div>
+      )}
 
       {/* Other Skills */}
+      {sectionVisible("skills") && (
       <div className="form-section">
         <div className="section-header">{t("otherSkills")}</div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
@@ -403,8 +428,10 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
           </FormField>
         </div>
       </div>
+      )}
 
       {/* Important Information */}
+      {sectionVisible("important") && (
       <div className="form-section">
         <div className="section-header">{t("importantInfo")}</div>
         <div className="p-4 space-y-4">
@@ -459,9 +486,10 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
           />
         </div>
       </div>
+      )}
 
       {/* Declaration */}
-      {!showHrSection && (
+      {!showHrSection && sectionVisible("declaration") && (
         <div className="form-section">
           <div className="section-header">{t("declaration")}</div>
           <div className="p-4 space-y-4">
@@ -479,6 +507,11 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
             </div>
           </div>
         </div>
+      )}
+
+      {/* HR-only: Job Offer & Exam Scores */}
+      {showHrSection && (
+        <HrExtras data={data} onChange={onChange} readOnly={readOnly} />
       )}
 
       {/* HR Section */}

@@ -15,6 +15,7 @@ export default function ApplyPage({ token }: { token: string }) {
   const [candidate, setCandidate] = useState<Partial<Candidate> | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [fieldVisibility, setFieldVisibility] = useState<Record<string, boolean> | undefined>();
 
   useEffect(() => {
     async function validate() {
@@ -28,6 +29,7 @@ export default function ApplyPage({ token }: { token: string }) {
         }
 
         setCandidate(data.candidate);
+        setFieldVisibility(data.fieldVisibility);
       } catch {
         setError("invalid");
       } finally {
@@ -115,8 +117,8 @@ export default function ApplyPage({ token }: { token: string }) {
       <header className="sticky top-0 z-30 bg-lotus-green shadow-md">
         <div className="max-w-4xl mx-auto flex items-center justify-between px-4 py-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-white/10 p-1.5 ring-1 ring-white/20">
-              <LotusLogo variant="white" className="h-8 w-auto" width={140} height={36} />
+            <div className="rounded-lg bg-white p-2">
+              <LotusLogo variant="official" className="h-12 w-auto" width={48} height={48} />
             </div>
             <div>
               <h1 className="text-white font-bold text-lg">{t("jobApplicationForm")}</h1>
@@ -134,6 +136,7 @@ export default function ApplyPage({ token }: { token: string }) {
           <ApplicationForm
             data={candidate || {}}
             onChange={(data) => setCandidate({ ...candidate, ...data })}
+            fieldVisibility={fieldVisibility}
           />
 
           <div className="mt-8 flex justify-center animate-slide-up">

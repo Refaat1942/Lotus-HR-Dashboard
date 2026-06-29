@@ -64,8 +64,9 @@ export const EDUCATIONAL_QUALIFICATIONS = [
   { ar: "ثانوية عامة", en: "High School" },
   { ar: "دبلوم", en: "Diploma" },
   { ar: "بكالوريوس", en: "Bachelor's Degree" },
-  { ar: "ليسانس صيدلة", en: "Pharmacy License" },
+  { ar: "بكالوريوس صيدلة", en: "Bachelor of Pharmacy" },
   { ar: "ماجستير", en: "Master's Degree" },
+  { ar: "ماجستير صيدلة", en: "Master of Pharmacy" },
   { ar: "دكتوراه", en: "PhD" },
 ];
 
@@ -87,15 +88,37 @@ export const CANDIDATE_STATUSES = [
 ];
 
 export const ROLE_PERMISSIONS = {
-  admin: ["view_candidates", "edit_candidates", "delete_candidates", "manage_users", "create_links", "edit_interviews"],
-  hr: ["view_candidates", "edit_candidates", "create_links", "edit_interviews"],
-  viewer: ["view_candidates"],
+  admin: ["view_candidates", "edit_candidates", "delete_candidates", "manage_users", "create_links", "edit_interviews", "manage_settings", "view_reports"],
+  hr: ["view_candidates", "edit_candidates", "create_links", "edit_interviews", "manage_settings", "view_reports"],
+  viewer: ["view_candidates", "view_reports"],
 } as const;
 
 export type Permission = (typeof ROLE_PERMISSIONS)[keyof typeof ROLE_PERMISSIONS][number];
 
 export function hasPermission(role: keyof typeof ROLE_PERMISSIONS, permission: Permission): boolean {
   return (ROLE_PERMISSIONS[role] as readonly string[]).includes(permission);
+}
+
+export function emptyJobOffer() {
+  return {
+    experienceYears: "",
+    basicSalary: "",
+    workNatureAllowance: "",
+    transportationAllowance: "",
+    kpiBonus: "",
+    totalSalary: "",
+    workHours: "",
+    notes: "",
+  };
+}
+
+export function emptyExamScores() {
+  return {
+    examScore: "",
+    examCorrect: "",
+    examGrade: "",
+    examNotes: "",
+  };
 }
 
 export function emptyInterview(): { mark: string; signature: string; date: string; comment: string } {
@@ -174,6 +197,8 @@ export function createEmptyCandidate(id: string, applicationNumber: string, posi
     declarationDate: "",
     firstInterview: emptyInterview(),
     secondInterview: emptyInterview(),
+    jobOffer: emptyJobOffer(),
+    examScores: emptyExamScores(),
     status: "pending" as const,
     createdAt: now,
     updatedAt: now,

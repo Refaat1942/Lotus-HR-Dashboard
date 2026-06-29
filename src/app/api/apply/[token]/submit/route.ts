@@ -1,25 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  getInviteLinkByToken,
   getCandidateByToken,
   submitCandidateApplication,
   markInviteLinkUsed,
+  isLinkUsable,
 } from "@/lib/db";
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
-  const link = getInviteLinkByToken(token);
+  const check = isLinkUsable(token);
 
-  if (!link) {
-    return NextResponse.json({ error: "invalid" }, { status: 404 });
-  }
-
-  if (link.usedAt) {
-    return NextResponse.json({ error: "used" }, { status: 410 });
-  }
-
-  if (link.expiresAt && new Date(link.expiresAt) < new Date()) {
-    return NextResponse.json({ error: "expired" }, { status: 410 });
+  if (!check.usable) {
+    return NextResponse.json({ error: check.reason || "invalid" }, { status: check.reason === "invalid" ? 404 : 410 });
   }
 
   const candidate = getCandidateByToken(token);
@@ -27,9 +19,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
+  if (candidate.status !== "pending") {
+    return NextResponse.json({ error: "used" }, { status: 410 });
+  }
+
   const body = await request.json();
-  const updated = submitCandidateApplication(candidate.id, body);
   markInviteLinkUsed(token, candidate.id);
+  const updated = submitCandidateApplication(candidate.id, body);
 
   return NextResponse.json({ success: true, candidate: updated });
 }

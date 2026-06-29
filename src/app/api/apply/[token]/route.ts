@@ -1,22 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getInviteLinkByToken, getCandidateByToken } from "@/lib/db";
+import { getInviteLinkByToken, getCandidateByToken, getSettings, isLinkUsable } from "@/lib/db";
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
-  const link = getInviteLinkByToken(token);
+  const check = isLinkUsable(token);
 
-  if (!link) {
-    return NextResponse.json({ error: "invalid", valid: false }, { status: 404 });
+  if (!check.usable) {
+    const link = getInviteLinkByToken(token);
+    const status = check.reason === "invalid" ? 404 : 410;
+    return NextResponse.json({ error: check.reason, valid: false, link }, { status });
   }
 
-  if (link.usedAt) {
-    return NextResponse.json({ error: "used", valid: false, link }, { status: 410 });
-  }
-
-  if (link.expiresAt && new Date(link.expiresAt) < new Date()) {
-    return NextResponse.json({ error: "expired", valid: false, link }, { status: 410 });
-  }
-
+  const link = getInviteLinkByToken(token)!;
   const candidate = getCandidateByToken(token);
-  return NextResponse.json({ valid: true, link, candidate });
+  const settings = getSettings();
+
+  return NextResponse.json({
+    valid: true,
+    link,
+    candidate,
+    fieldVisibility: settings.fieldVisibility,
+  });
 }

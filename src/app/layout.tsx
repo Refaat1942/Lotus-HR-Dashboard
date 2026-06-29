@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   title: "Lotus HR Dashboard | لوحة تحكم الموارد البشرية",
   description: "Lotus Pharmacies HR Job Application Management System",
   icons: {
-    icon: "/lotus-logo.png",
-    apple: "/lotus-logo.png",
+    icon: "/lotus-logo-official.png",
+    apple: "/lotus-logo-official.png",
   },
 };
 

@@ -2,8 +2,9 @@ import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import fs from "fs";
-import type { Candidate, InviteLink, User, UserRole } from "./types";
-import { createEmptyCandidate } from "./constants";
+import type { Candidate, InviteLink, User, UserRole, AppSettings } from "./types";
+import { createEmptyCandidate, emptyJobOffer, emptyExamScores } from "./constants";
+import { defaultFieldVisibility, mergeFieldVisibility } from "./fieldConfig";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DB_FILE = path.join(DATA_DIR, "db.json");
@@ -12,6 +13,7 @@ interface DbSchema {
   users: User[];
   candidates: Candidate[];
   inviteLinks: InviteLink[];
+  settings?: AppSettings;
 }
 
 function defaultDb(): DbSchema {
@@ -30,6 +32,7 @@ function defaultDb(): DbSchema {
     ],
     candidates: [],
     inviteLinks: [],
+    settings: { fieldVisibility: defaultFieldVisibility() },
   };
 }
 
@@ -44,7 +47,33 @@ function readDb(): DbSchema {
   }
   const raw = fs.readFileSync(DB_FILE, "utf-8");
   const db = JSON.parse(raw) as DbSchema;
-  return ensureDefaultAdmin(db);
+  return ensureDbIntegrity(db);
+}
+
+function ensureDbIntegrity(db: DbSchema): DbSchema {
+  let changed = false;
+
+  if (!db.settings) {
+    db.settings = { fieldVisibility: defaultFieldVisibility() };
+    changed = true;
+  } else {
+    db.settings.fieldVisibility = mergeFieldVisibility(db.settings.fieldVisibility);
+  }
+
+  db = ensureDefaultAdmin(db);
+
+  db.candidates = db.candidates.map((c) => {
+    const normalized = {
+      ...c,
+      jobOffer: c.jobOffer || emptyJobOffer(),
+      examScores: c.examScores || emptyExamScores(),
+    };
+    if (!c.jobOffer || !c.examScores) changed = true;
+    return normalized;
+  });
+
+  if (changed) writeDb(db);
+  return db;
 }
 
 function ensureDefaultAdmin(db: DbSchema): DbSchema {
@@ -258,5 +287,50 @@ export function getDashboardStats() {
     pendingApplications: db.candidates.filter((c) => c.status === "pending").length,
     submittedApplications: db.candidates.filter((c) => c.status !== "pending").length,
     activeLinks: db.inviteLinks.filter((l) => !l.usedAt).length,
+    usedLinks: db.inviteLinks.filter((l) => l.usedAt).length,
+    acceptedCandidates: db.candidates.filter((c) => c.status === "accepted").length,
+    rejectedCandidates: db.candidates.filter((c) => c.status === "rejected").length,
   };
+}
+
+export function getSettings(): AppSettings {
+  const db = readDb();
+  return db.settings || { fieldVisibility: defaultFieldVisibility() };
+}
+
+export function updateSettings(settings: Partial<AppSettings>): AppSettings {
+  const db = readDb();
+  db.settings = {
+    fieldVisibility: mergeFieldVisibility({
+      ...db.settings?.fieldVisibility,
+      ...settings.fieldVisibility,
+    }),
+  };
+  writeDb(db);
+  return db.settings;
+}
+
+export function getReportData() {
+  const db = readDb();
+  return {
+    stats: getDashboardStats(),
+    candidates: getAllCandidates(),
+    links: getAllInviteLinks(),
+    users: getAllUsers(),
+    generatedAt: new Date().toISOString(),
+  };
+}
+
+export function isLinkUsable(token: string): { usable: boolean; reason?: string } {
+  const link = getInviteLinkByToken(token);
+  if (!link) return { usable: false, reason: "invalid" };
+  if (link.usedAt) return { usable: false, reason: "used" };
+  if (link.expiresAt && new Date(link.expiresAt) < new Date()) return { usable: false, reason: "expired" };
+
+  const candidate = getCandidateByToken(token);
+  if (candidate && candidate.status !== "pending") {
+    return { usable: false, reason: "used" };
+  }
+
+  return { usable: true };
 }

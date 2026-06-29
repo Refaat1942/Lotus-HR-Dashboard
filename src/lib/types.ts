@@ -26,6 +26,28 @@ export interface TrainingCourse {
   notes: string;
 }
 
+export interface JobOffer {
+  experienceYears: string;
+  basicSalary: string;
+  workNatureAllowance: string;
+  transportationAllowance: string;
+  kpiBonus: string;
+  totalSalary: string;
+  workHours: string;
+  notes: string;
+}
+
+export interface ExamScores {
+  examScore: string;
+  examCorrect: string;
+  examGrade: string;
+  examNotes: string;
+}
+
+export interface AppSettings {
+  fieldVisibility: Record<string, boolean>;
+}
+
 export interface InterviewRecord {
   mark: string;
   signature: string;
@@ -89,6 +111,9 @@ export interface Candidate {
 
   firstInterview: InterviewRecord;
   secondInterview: InterviewRecord;
+
+  jobOffer: JobOffer;
+  examScores: ExamScores;
 
   status: "pending" | "submitted" | "reviewing" | "interviewed" | "accepted" | "rejected";
   createdAt: string;
