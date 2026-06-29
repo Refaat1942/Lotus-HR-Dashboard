@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+@theme {
+  --color-lotus-green: #083f23;
+  --color-lotus-green-light: #0a5230;
+  --color-lotus-lime: #8dc63f;
+  --color-lotus-lime-light: #a5d65a;
+  --color-lotus-gray: #d7d7d7;
+  --color-lotus-gray-dark: #6b7280;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-arabic: var(--font-cairo), system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+
+  [dir="rtl"] body {
+    font-family: var(--font-arabic);
+  }
+
+  [dir="ltr"] body {
+    font-family: var(--font-sans);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+
+  .animate-slide-in-right {
+    animation: slideInRight 0.4s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out forwards;
+  }
+
+  .animate-pulse-soft {
+    animation: pulseSoft 2s ease-in-out infinite;
+  }
+
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.1s; }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.2s; }
+  .stagger-5 { animation-delay: 0.25s; }
+  .stagger-6 { animation-delay: 0.3s; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+}
+
+.btn-lotus {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-lotus-green px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-lotus-green-light hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-lotus-outline {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg border-2 border-lotus-green px-4 py-2.5 text-sm font-medium text-lotus-green transition-all duration-300 hover:bg-lotus-green hover:text-white active:scale-[0.98];
+}
+
+.btn-lotus-lime {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg bg-lotus-lime px-4 py-2.5 text-sm font-medium text-lotus-green transition-all duration-300 hover:bg-lotus-lime-light hover:shadow-md active:scale-[0.98];
+}
+
+.input-field {
+  @apply w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm transition-all duration-200 focus:border-lotus-lime focus:outline-none focus:ring-2 focus:ring-lotus-lime/30;
+}
+
+.select-field {
+  @apply w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm transition-all duration-200 focus:border-lotus-lime focus:outline-none focus:ring-2 focus:ring-lotus-lime/30;
+}
+
+.section-header {
+  @apply bg-lotus-green px-4 py-2.5 text-sm font-semibold text-white rounded-t-lg;
+}
+
+.form-section {
+  @apply rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden;
+}

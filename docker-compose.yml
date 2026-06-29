@@ -1,0 +1,17 @@
+services:
+  lotus-hr:
+    build: .
+    container_name: lotus-hr-dashboard
+    restart: unless-stopped
+    ports:
+      - "16310:16310"
+    environment:
+      - NODE_ENV=production
+      - PORT=16310
+      - HOSTNAME=0.0.0.0
+      - JWT_SECRET=${JWT_SECRET:-change-this-secret-in-production}
+    volumes:
+      - lotus-hr-data:/app/data
+
+volumes:
+  lotus-hr-data:
