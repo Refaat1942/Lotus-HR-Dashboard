@@ -135,6 +135,8 @@ export interface Candidate {
   examScores: ExamScores;
 
   status: "pending" | "submitted" | "reviewing" | "interviewed" | "accepted" | "rejected";
+  decisionReason: string;
+  decidedAt: string | null;
   createdAt: string;
   updatedAt: string;
   submittedAt: string | null;

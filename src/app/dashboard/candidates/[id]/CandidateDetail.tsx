@@ -12,7 +12,7 @@ import { getStatusLabel, getLocalizedOption } from "@/lib/i18n";
 import { resolveOptionLabel } from "@/lib/options-i18n";
 import { EGYPTIAN_GOVERNORATES } from "@/lib/constants";
 import { resolveJobPositionLabel } from "@/lib/jobs";
-import { ArrowLeft, Save, Trash2, Printer } from "lucide-react";
+import { ArrowLeft, Save, Trash2, Printer, CheckCircle, XCircle } from "lucide-react";
 
 interface CandidateDetailProps {
   candidate: Candidate;
@@ -26,6 +26,8 @@ export function CandidateDetail({ candidate: initial, userPermissions, userRole 
   const [candidate, setCandidate] = useState(initial);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [decisionReason, setDecisionReason] = useState(initial.decisionReason || "");
+  const [deciding, setDeciding] = useState(false);
 
   const sessionLike = { role: userRole, permissions: userPermissions };
   const canEdit = hasSessionPermission(sessionLike, "edit_candidates");
@@ -43,11 +45,44 @@ export function CandidateDetail({ candidate: initial, userPermissions, userRole 
       if (res.ok) {
         const data = await res.json();
         setCandidate(data.candidate);
+        setDecisionReason(data.candidate.decisionReason || "");
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
       }
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleDecision(status: "accepted" | "rejected") {
+    if (!decisionReason.trim()) {
+      alert(t("decisionReasonRequired"));
+      return;
+    }
+
+    const label = status === "accepted" ? t("acceptCandidate") : t("rejectCandidate");
+    if (!confirm(`${label}?`)) return;
+
+    setDeciding(true);
+    try {
+      const updated = {
+        ...candidate,
+        status,
+        decisionReason: decisionReason.trim(),
+        decidedAt: new Date().toISOString(),
+      };
+      const res = await fetch(`/api/candidates/${candidate.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCandidate(data.candidate);
+        setDecisionReason(data.candidate.decisionReason || "");
+      }
+    } finally {
+      setDeciding(false);
     }
   }
 
@@ -134,6 +169,82 @@ export function CandidateDetail({ candidate: initial, userPermissions, userRole 
           </div>
         </div>
       </div>
+
+      {(canEdit || candidate.status === "accepted" || candidate.status === "rejected") && (
+        <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden print:hidden">
+          <div className="section-header flex items-center gap-2">
+            {candidate.status === "accepted" ? (
+              <CheckCircle className="h-4 w-4" />
+            ) : candidate.status === "rejected" ? (
+              <XCircle className="h-4 w-4" />
+            ) : null}
+            {t("hiringDecision")}
+          </div>
+          <div className="p-4 space-y-4">
+            {canEdit && !(candidate.status === "accepted" || candidate.status === "rejected") && (
+              <p className="text-sm text-gray-600">{t("hiringDecisionDesc")}</p>
+            )}
+
+            {(candidate.status === "accepted" || candidate.status === "rejected") && (
+              <div
+                className={`rounded-lg border px-4 py-3 text-sm ${
+                  candidate.status === "accepted"
+                    ? "border-green-200 bg-green-50 text-green-800"
+                    : "border-red-200 bg-red-50 text-red-800"
+                }`}
+              >
+                <p className="font-semibold">{t("currentDecision")}: {getStatusLabel(locale, candidate.status)}</p>
+                {candidate.decisionReason && (
+                  <p className="mt-1">{t("decisionReason")}: {candidate.decisionReason}</p>
+                )}
+                {candidate.decidedAt && (
+                  <p className="mt-1 text-xs opacity-80">
+                    {t("decidedOn")}: {new Date(candidate.decidedAt).toLocaleString(locale === "ar" ? "ar-EG" : "en-GB")}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {canEdit && (
+              <>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                    {t("decisionReason")} <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={decisionReason}
+                    onChange={(e) => setDecisionReason(e.target.value)}
+                    placeholder={t("decisionReasonPlaceholder")}
+                    rows={3}
+                    className="input-field resize-y min-h-[80px]"
+                  />
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleDecision("accepted")}
+                    disabled={deciding}
+                    className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-green-700 disabled:opacity-50"
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    {t("acceptCandidate")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDecision("rejected")}
+                    disabled={deciding}
+                    className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-red-700 disabled:opacity-50"
+                  >
+                    <XCircle className="h-4 w-4" />
+                    {t("rejectCandidate")}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <ApplicationForm
         data={candidate}

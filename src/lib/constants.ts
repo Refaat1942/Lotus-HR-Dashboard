@@ -286,6 +286,8 @@ export function createEmptyCandidate(id: string, applicationNumber: string, posi
     jobOffer: emptyJobOffer(),
     examScores: emptyExamScores(),
     status: "pending" as const,
+    decisionReason: "",
+    decidedAt: null,
     createdAt: now,
     updatedAt: now,
     submittedAt: null,

@@ -85,8 +85,15 @@ function ensureDbIntegrity(db: DbSchema): DbSchema {
     const position = normalizeJobPositionStorage(withOptions.positionAppliedFor);
     if (withOptions !== normalized) changed = true;
     if (position !== withOptions.positionAppliedFor) changed = true;
+    if (withOptions.decisionReason === undefined) changed = true;
+    if (withOptions.decidedAt === undefined) changed = true;
 
-    return { ...withOptions, positionAppliedFor: position };
+    return {
+      ...withOptions,
+      positionAppliedFor: position,
+      decisionReason: withOptions.decisionReason ?? "",
+      decidedAt: withOptions.decidedAt ?? null,
+    };
   });
 
   db.inviteLinks = db.inviteLinks.map((link) => {
