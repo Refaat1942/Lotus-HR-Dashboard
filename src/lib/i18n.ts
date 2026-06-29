@@ -1,4 +1,6 @@
 import type { Locale } from "./types";
+import { CANDIDATE_STATUSES } from "./constants";
+import { resolveOptionLabel } from "./options-i18n";
 
 const translations = {
   ar: {
@@ -215,6 +217,13 @@ const translations = {
     permViewReports: "عرض التقارير",
     permManageSettings: "إدارة الإعدادات",
     permManageUsers: "إدارة المستخدمين",
+    switchLanguage: "تغيير اللغة",
+    placeholderExperienceYears: "3 سنوات",
+    placeholderWorkHours: "8.5 / 10 ساعات",
+    placeholderExamScore: "90%=",
+    placeholderExamCorrect: "18/20",
+    placeholderExamGrade: "C+ / 5",
+    day: "يوم",
   },
   en: {
     appName: "Lotus - HR",
@@ -430,6 +439,13 @@ const translations = {
     permViewReports: "View reports",
     permManageSettings: "Manage settings",
     permManageUsers: "Manage users",
+    switchLanguage: "Switch language",
+    placeholderExperienceYears: "3 years",
+    placeholderWorkHours: "8.5 / 10 hrs",
+    placeholderExamScore: "90%=",
+    placeholderExamCorrect: "18/20",
+    placeholderExamGrade: "C+ / 5",
+    day: "day",
   },
 } as const;
 
@@ -441,23 +457,14 @@ export function t(locale: Locale, key: TranslationKey): string {
 
 export function getLocalizedOption(
   locale: Locale,
-  options: readonly { ar: string; en: string }[]
+  options: readonly { ar: string; en: string; value: string }[]
 ): { value: string; label: string }[] {
   return options.map((opt) => ({
-    value: locale === "ar" ? opt.ar : opt.en,
+    value: opt.value,
     label: locale === "ar" ? opt.ar : opt.en,
   }));
 }
 
 export function getStatusLabel(locale: Locale, status: string): string {
-  const found = [
-    { ar: "قيد الانتظار", en: "Pending", value: "pending" },
-    { ar: "تم التقديم", en: "Submitted", value: "submitted" },
-    { ar: "قيد المراجعة", en: "Reviewing", value: "reviewing" },
-    { ar: "تمت المقابلة", en: "Interviewed", value: "interviewed" },
-    { ar: "مقبول", en: "Accepted", value: "accepted" },
-    { ar: "مرفوض", en: "Rejected", value: "rejected" },
-  ].find((s) => s.value === status);
-  if (!found) return status;
-  return locale === "ar" ? found.ar : found.en;
+  return resolveOptionLabel(locale, CANDIDATE_STATUSES, status);
 }

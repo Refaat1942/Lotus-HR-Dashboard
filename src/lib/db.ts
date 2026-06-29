@@ -3,7 +3,9 @@ import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import fs from "fs";
 import type { Candidate, InviteLink, User, UserRole, AppSettings, BrandingSettings, Permission } from "./types";
-import { createEmptyCandidate, emptyJobOffer, emptyExamScores, getEffectivePermissions } from "./constants";
+import { createEmptyCandidate, emptyJobOffer, emptyExamScores, CANDIDATE_OPTION_FIELDS } from "./constants";
+import { normalizeOptionFields } from "./options-i18n";
+import { normalizeJobPositionStorage } from "./jobs";
 import { defaultFieldVisibility, mergeFieldVisibility } from "./fieldConfig";
 import { defaultBranding } from "./branding";
 
@@ -69,13 +71,31 @@ function ensureDbIntegrity(db: DbSchema): DbSchema {
   db = ensureDefaultAdmin(db);
 
   db.candidates = db.candidates.map((c) => {
-    const normalized = {
+    let normalized = {
       ...c,
       jobOffer: c.jobOffer || emptyJobOffer(),
       examScores: c.examScores || emptyExamScores(),
     };
     if (!c.jobOffer || !c.examScores) changed = true;
-    return normalized;
+
+    const withOptions = normalizeOptionFields(
+      normalized,
+      CANDIDATE_OPTION_FIELDS.map((f) => ({ key: f.key, options: f.options }))
+    );
+    const position = normalizeJobPositionStorage(withOptions.positionAppliedFor);
+    if (withOptions !== normalized) changed = true;
+    if (position !== withOptions.positionAppliedFor) changed = true;
+
+    return { ...withOptions, positionAppliedFor: position };
+  });
+
+  db.inviteLinks = db.inviteLinks.map((link) => {
+    const position = normalizeJobPositionStorage(link.positionAppliedFor);
+    if (position !== link.positionAppliedFor) {
+      changed = true;
+      return { ...link, positionAppliedFor: position };
+    }
+    return link;
   });
 
   db.users = db.users.map((u) => {

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import type { InviteLink } from "@/lib/types";
 import { copyToClipboard } from "@/lib/clipboard";
-import { JOB_POSITIONS, LINK_EXPIRY_DAYS, resolveJobPosition } from "@/lib/jobs";
+import { JOB_POSITIONS, LINK_EXPIRY_DAYS, resolveJobPositionStorage, resolveJobPositionLabel } from "@/lib/jobs";
 import { Link2, Copy, Check, Plus, ExternalLink, AlertCircle, Trash2 } from "lucide-react";
 
 interface LinksManagerProps {
@@ -48,7 +48,7 @@ export function LinksManager({ initialLinks, canDelete = true }: LinksManagerPro
     if (!jobValue) return;
     if (jobValue === "other" && !otherJob.trim()) return;
 
-    const position = resolveJobPosition(jobValue, otherJob, locale);
+    const position = resolveJobPositionStorage(jobValue, otherJob);
     setCreating(true);
 
     try {
@@ -122,7 +122,7 @@ export function LinksManager({ initialLinks, canDelete = true }: LinksManagerPro
               >
                 {LINK_EXPIRY_DAYS.map((d) => (
                   <option key={d} value={d}>
-                    {d} {t("days")}
+                    {d} {d === 1 ? t("day") : t("days")}
                   </option>
                 ))}
               </select>
@@ -183,7 +183,7 @@ export function LinksManager({ initialLinks, canDelete = true }: LinksManagerPro
               return (
                 <div key={link.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
                   <div>
-                    <p className="font-medium text-gray-900">{link.positionAppliedFor}</p>
+                    <p className="font-medium text-gray-900">{resolveJobPositionLabel(locale, link.positionAppliedFor)}</p>
                     <p className="text-xs text-gray-500 mt-1">
                       {t("createdAt")}: {new Date(link.createdAt).toLocaleDateString()}
                       {link.expiresAt && ` · ${t("expiresIn")} ${Math.max(0, Math.ceil((new Date(link.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} ${t("days")}`}
@@ -218,7 +218,7 @@ export function LinksManager({ initialLinks, canDelete = true }: LinksManagerPro
             {usedLinks.map((link) => (
               <div key={link.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4">
                 <div>
-                  <p className="font-medium text-gray-700">{link.positionAppliedFor}</p>
+                  <p className="font-medium text-gray-700">{resolveJobPositionLabel(locale, link.positionAppliedFor)}</p>
                   <p className="text-xs text-gray-500 mt-1">
                     {t("usedAt")}: {link.usedAt ? new Date(link.usedAt).toLocaleDateString() : "-"}
                   </p>

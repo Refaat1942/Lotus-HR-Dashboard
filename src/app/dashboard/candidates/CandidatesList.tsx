@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
+import { getLocalizedOption } from "@/lib/i18n";
 import { CandidateCard } from "@/components/CandidateCard";
 import type { Candidate } from "@/lib/types";
 import { Search, Users } from "lucide-react";
@@ -54,9 +55,9 @@ export function CandidatesList({ initialCandidates }: CandidatesListProps) {
           className="select-field sm:w-48"
         >
           <option value="all">{t("allStatuses")}</option>
-          {CANDIDATE_STATUSES.map((s) => (
+          {getLocalizedOption(locale, CANDIDATE_STATUSES).map((s) => (
             <option key={s.value} value={s.value}>
-              {locale === "ar" ? s.ar : s.en}
+              {s.label}
             </option>
           ))}
         </select>

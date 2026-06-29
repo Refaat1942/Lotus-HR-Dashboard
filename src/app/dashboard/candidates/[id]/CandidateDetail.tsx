@@ -8,7 +8,10 @@ import { ApplicationForm } from "@/components/ApplicationForm";
 import type { Candidate, Permission } from "@/lib/types";
 import { hasSessionPermission } from "@/lib/constants";
 import { CANDIDATE_STATUSES } from "@/lib/constants";
-import { getStatusLabel } from "@/lib/i18n";
+import { getStatusLabel, getLocalizedOption } from "@/lib/i18n";
+import { resolveOptionLabel } from "@/lib/options-i18n";
+import { EGYPTIAN_GOVERNORATES } from "@/lib/constants";
+import { resolveJobPositionLabel } from "@/lib/jobs";
 import { ArrowLeft, Save, Trash2, Printer } from "lucide-react";
 
 interface CandidateDetailProps {
@@ -82,9 +85,9 @@ export function CandidateDetail({ candidate: initial, userPermissions, userRole 
                 onChange={(e) => setCandidate({ ...candidate, status: e.target.value as Candidate["status"] })}
                 className="select-field w-auto text-sm"
               >
-                {CANDIDATE_STATUSES.map((s) => (
+                {getLocalizedOption(locale, CANDIDATE_STATUSES).map((s) => (
                   <option key={s.value} value={s.value}>
-                    {locale === "ar" ? s.ar : s.en}
+                    {s.label}
                   </option>
                 ))}
               </select>
@@ -112,7 +115,7 @@ export function CandidateDetail({ candidate: initial, userPermissions, userRole 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h3 className="text-2xl font-bold">{candidate.fullName || t("notSubmitted")}</h3>
-            <p className="text-white/80 mt-1 print:text-gray-600">{candidate.positionAppliedFor}</p>
+            <p className="text-white/80 mt-1 print:text-gray-600">{resolveJobPositionLabel(locale, candidate.positionAppliedFor)}</p>
           </div>
           <div className="flex flex-wrap gap-3 text-sm">
             <span className="rounded-full bg-white/20 px-3 py-1 print:bg-gray-100 print:text-gray-800">
@@ -125,7 +128,7 @@ export function CandidateDetail({ candidate: initial, userPermissions, userRole 
             )}
             {candidate.governorate && (
               <span className="rounded-full bg-white/20 px-3 py-1 print:bg-gray-100 print:text-gray-800">
-                {candidate.governorate}
+                {resolveOptionLabel(locale, EGYPTIAN_GOVERNORATES, candidate.governorate)}
               </span>
             )}
           </div>

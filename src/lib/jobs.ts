@@ -11,18 +11,37 @@ export const JOB_POSITIONS = [
 
 export const LINK_EXPIRY_DAYS = [1, 2, 3] as const;
 
-export function getJobPositionLabel(
-  locale: "ar" | "en",
-  value: string,
-  customText?: string
-): string {
-  if (value === "other" && customText) return customText;
+export function getJobPositionLabel(locale: "ar" | "en", value: string): string {
   const found = JOB_POSITIONS.find((p) => p.value === value);
   if (!found) return value;
   return locale === "ar" ? found.ar : found.en;
 }
 
-export function resolveJobPosition(value: string, customText: string, locale: "ar" | "en"): string {
+export function resolveJobPositionLabel(locale: "ar" | "en", stored: string): string {
+  if (!stored) return stored;
+  const found = JOB_POSITIONS.find(
+    (p) => p.value === stored || p.ar === stored || p.en === stored
+  );
+  if (!found) return stored;
+  return locale === "ar" ? found.ar : found.en;
+}
+
+export function resolveJobPositionStorage(value: string, customText: string): string {
   if (value === "other") return customText.trim();
-  return getJobPositionLabel(locale, value);
+  return value;
+}
+
+/** @deprecated use resolveJobPositionStorage + resolveJobPositionLabel */
+export function resolveJobPosition(value: string, customText: string, locale: "ar" | "en"): string {
+  return resolveJobPositionStorage(value, customText) === value
+    ? getJobPositionLabel(locale, value)
+    : customText.trim();
+}
+
+export function normalizeJobPositionStorage(stored: string): string {
+  if (!stored) return stored;
+  const found = JOB_POSITIONS.find(
+    (p) => p.value === stored || p.ar === stored || p.en === stored
+  );
+  return found?.value ?? stored;
 }

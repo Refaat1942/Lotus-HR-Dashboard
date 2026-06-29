@@ -44,7 +44,7 @@ export function HrExtras({ data, onChange, readOnly = false }: HrExtrasProps) {
         <div className="section-header">{t("jobOffer")}</div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
           <Field label={t("experienceYears")}>
-            <input type="text" value={job.experienceYears} onChange={(e) => updateJobOffer("experienceYears", e.target.value)} disabled={readOnly} className="input-field" placeholder="3 years" />
+            <input type="text" value={job.experienceYears} onChange={(e) => updateJobOffer("experienceYears", e.target.value)} disabled={readOnly} className="input-field" placeholder={t("placeholderExperienceYears")} />
           </Field>
           <Field label={t("basicSalary")}>
             <input type="number" value={job.basicSalary} onChange={(e) => updateJobOffer("basicSalary", e.target.value)} disabled={readOnly} className="input-field" />
@@ -62,7 +62,7 @@ export function HrExtras({ data, onChange, readOnly = false }: HrExtrasProps) {
             <input type="number" value={job.totalSalary} onChange={(e) => updateJobOffer("totalSalary", e.target.value)} disabled={readOnly} className="input-field" />
           </Field>
           <Field label={t("workHours")}>
-            <input type="text" value={job.workHours} onChange={(e) => updateJobOffer("workHours", e.target.value)} disabled={readOnly} className="input-field" placeholder="8.5 / 10 hrs" />
+            <input type="text" value={job.workHours} onChange={(e) => updateJobOffer("workHours", e.target.value)} disabled={readOnly} className="input-field" placeholder={t("placeholderWorkHours")} />
           </Field>
           <Field label={t("notes")}>
             <input type="text" value={job.notes} onChange={(e) => updateJobOffer("notes", e.target.value)} disabled={readOnly} className="input-field" />
@@ -74,13 +74,13 @@ export function HrExtras({ data, onChange, readOnly = false }: HrExtrasProps) {
         <div className="section-header">{t("examScores")}</div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
           <Field label={t("examScore")}>
-            <input type="text" value={exam.examScore} onChange={(e) => updateExam("examScore", e.target.value)} disabled={readOnly} className="input-field" placeholder="90%=" />
+            <input type="text" value={exam.examScore} onChange={(e) => updateExam("examScore", e.target.value)} disabled={readOnly} className="input-field" placeholder={t("placeholderExamScore")} />
           </Field>
           <Field label={t("examCorrect")}>
-            <input type="text" value={exam.examCorrect} onChange={(e) => updateExam("examCorrect", e.target.value)} disabled={readOnly} className="input-field" placeholder="18/20" />
+            <input type="text" value={exam.examCorrect} onChange={(e) => updateExam("examCorrect", e.target.value)} disabled={readOnly} className="input-field" placeholder={t("placeholderExamCorrect")} />
           </Field>
           <Field label={t("examGrade")}>
-            <input type="text" value={exam.examGrade} onChange={(e) => updateExam("examGrade", e.target.value)} disabled={readOnly} className="input-field" placeholder="C+ / 5" />
+            <input type="text" value={exam.examGrade} onChange={(e) => updateExam("examGrade", e.target.value)} disabled={readOnly} className="input-field" placeholder={t("placeholderExamGrade")} />
           </Field>
           <Field label={t("notes")}>
             <input type="text" value={exam.examNotes} onChange={(e) => updateExam("examNotes", e.target.value)} disabled={readOnly} className="input-field" />

@@ -104,8 +104,9 @@ export function DashboardLayout({ user, children }: DashboardLayoutProps) {
               })}
           </nav>
 
-          <div className="border-t border-white/10 p-4">
-            <div className="mb-3 rounded-lg bg-white/10 px-4 py-3">
+          <div className="border-t border-white/10 p-4 space-y-2">
+            <LanguageSwitcher variant="dark" />
+            <div className="rounded-lg bg-white/10 px-4 py-3">
               <p className="text-xs text-white/60">{t("welcome")}</p>
               <p className="text-sm font-medium text-white">{displayName || user.username}</p>
               <p className="text-xs text-lotus-lime capitalize">{t(user.role as "admin" | "hr" | "viewer")}</p>
@@ -138,7 +139,7 @@ export function DashboardLayout({ user, children }: DashboardLayoutProps) {
               <p className="text-xs text-gray-500">{t("appSubtitle")}</p>
             </div>
           </div>
-          <LanguageSwitcher />
+          <LanguageSwitcher variant="light" />
         </header>
 
         <main className="p-4 lg:p-8 animate-fade-in">{children}</main>

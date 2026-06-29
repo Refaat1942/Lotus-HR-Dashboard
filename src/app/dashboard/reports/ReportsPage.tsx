@@ -3,6 +3,9 @@
 import { useLanguage } from "@/components/LanguageProvider";
 import type { Candidate, InviteLink } from "@/lib/types";
 import { getStatusLabel } from "@/lib/i18n";
+import { resolveOptionLabel } from "@/lib/options-i18n";
+import { EGYPTIAN_GOVERNORATES } from "@/lib/constants";
+import { resolveJobPositionLabel } from "@/lib/jobs";
 import { Download, Printer, BarChart3, Users, Link2, CheckCircle, XCircle } from "lucide-react";
 
 interface ReportsPageProps {
@@ -32,13 +35,13 @@ export function ReportsPage({ data }: ReportsPageProps) {
   }, {});
 
   const byPosition = candidates.reduce<Record<string, number>>((acc, c) => {
-    const key = c.positionAppliedFor || "—";
+    const key = resolveJobPositionLabel(locale, c.positionAppliedFor || "") || "—";
     acc[key] = (acc[key] || 0) + 1;
     return acc;
   }, {});
 
   const byGovernorate = candidates.reduce<Record<string, number>>((acc, c) => {
-    const key = c.governorate || "—";
+    const key = resolveOptionLabel(locale, EGYPTIAN_GOVERNORATES, c.governorate) || "—";
     acc[key] = (acc[key] || 0) + 1;
     return acc;
   }, {});
@@ -109,7 +112,7 @@ export function ReportsPage({ data }: ReportsPageProps) {
                 <tr key={c.id} className="border-t border-gray-100">
                   <td className="px-3 py-2">{c.applicationNumber}</td>
                   <td className="px-3 py-2">{c.fullName || t("notSubmitted")}</td>
-                  <td className="px-3 py-2">{c.positionAppliedFor}</td>
+                  <td className="px-3 py-2">{resolveJobPositionLabel(locale, c.positionAppliedFor)}</td>
                   <td className="px-3 py-2">{getStatusLabel(locale, c.status)}</td>
                   <td className="px-3 py-2" dir="ltr">{c.mobile1}</td>
                   <td className="px-3 py-2">{c.examScores?.examScore || "—"}</td>

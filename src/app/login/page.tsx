@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { LotusLogo } from "@/components/LotusLogo";
 import { useLanguage } from "@/components/LanguageProvider";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Lock, User, AlertCircle, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
@@ -57,10 +56,7 @@ export default function LoginPage() {
         />
       </div>
 
-      {/* Language switcher */}
-      <div className="absolute top-5 end-5 z-20">
-        <LanguageSwitcher />
-      </div>
+      {/* Language switcher removed — available on dashboard and application pages */}
 
       {/* Main content */}
       <div className="relative z-10 flex min-h-screen items-center justify-center p-4 sm:p-8">

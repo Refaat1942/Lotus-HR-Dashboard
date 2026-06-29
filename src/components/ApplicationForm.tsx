@@ -2,6 +2,7 @@
 
 import { useLanguage } from "./LanguageProvider";
 import { getLocalizedOption } from "@/lib/i18n";
+import { resolveOptionValue } from "@/lib/options-i18n";
 import {
   EGYPTIAN_GOVERNORATES,
   GENDERS,
@@ -14,6 +15,7 @@ import {
 } from "@/lib/constants";
 import type { Candidate, WorkExperience, TrainingCourse } from "@/lib/types";
 import { isFieldVisible, isSectionVisible } from "@/lib/fieldConfig";
+import { resolveJobPositionLabel } from "@/lib/jobs";
 import { HrExtras } from "./HrExtras";
 import { Plus, Trash2 } from "lucide-react";
 
@@ -170,7 +172,7 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
           <FormField label={t("positionAppliedFor")} required>
             <input
               type="text"
-              value={data.positionAppliedFor || ""}
+              value={readOnly ? resolveJobPositionLabel(locale, data.positionAppliedFor || "") : (data.positionAppliedFor || "")}
               onChange={(e) => update("positionAppliedFor", e.target.value)}
               disabled={readOnly}
               className="input-field"
@@ -217,7 +219,7 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
             <input type="text" value={data.area || ""} onChange={(e) => update("area", e.target.value)} disabled={readOnly} className="input-field" />
           </FormField>
           <FormField label={t("governorate")}>
-            <select value={data.governorate || ""} onChange={(e) => update("governorate", e.target.value)} disabled={readOnly} className="select-field">
+            <select value={resolveOptionValue(EGYPTIAN_GOVERNORATES, data.governorate || "")} onChange={(e) => update("governorate", e.target.value)} disabled={readOnly} className="select-field">
               <option value="">{t("selectOption")}</option>
               {selectOptions.governorate.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -226,13 +228,13 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
             <input type="date" value={data.dateOfBirth || ""} onChange={(e) => update("dateOfBirth", e.target.value)} disabled={readOnly} className="input-field" />
           </FormField>
           <FormField label={t("gender")}>
-            <select value={data.gender || ""} onChange={(e) => update("gender", e.target.value)} disabled={readOnly} className="select-field">
+            <select value={resolveOptionValue(GENDERS, data.gender || "")} onChange={(e) => update("gender", e.target.value)} disabled={readOnly} className="select-field">
               <option value="">{t("selectOption")}</option>
               {selectOptions.gender.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </FormField>
           <FormField label={t("maritalStatus")}>
-            <select value={data.maritalStatus || ""} onChange={(e) => update("maritalStatus", e.target.value)} disabled={readOnly} className="select-field">
+            <select value={resolveOptionValue(MARITAL_STATUSES, data.maritalStatus || "")} onChange={(e) => update("maritalStatus", e.target.value)} disabled={readOnly} className="select-field">
               <option value="">{t("selectOption")}</option>
               {selectOptions.maritalStatus.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -241,7 +243,7 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
             <input type="number" min="0" value={data.numberOfChildren || "0"} onChange={(e) => update("numberOfChildren", e.target.value)} disabled={readOnly} className="input-field" />
           </FormField>
           <FormField label={t("religion")}>
-            <select value={data.religion || ""} onChange={(e) => update("religion", e.target.value)} disabled={readOnly} className="select-field">
+            <select value={resolveOptionValue(RELIGIONS, data.religion || "")} onChange={(e) => update("religion", e.target.value)} disabled={readOnly} className="select-field">
               <option value="">{t("selectOption")}</option>
               {selectOptions.religion.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -253,7 +255,7 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
             <input type="tel" dir="ltr" value={data.mobile2 || ""} onChange={(e) => update("mobile2", e.target.value)} disabled={readOnly} className="input-field" />
           </FormField>
           <FormField label={t("educationalQualification")}>
-            <select value={data.educationalQualification || ""} onChange={(e) => update("educationalQualification", e.target.value)} disabled={readOnly} className="select-field">
+            <select value={resolveOptionValue(EDUCATIONAL_QUALIFICATIONS, data.educationalQualification || "")} onChange={(e) => update("educationalQualification", e.target.value)} disabled={readOnly} className="select-field">
               <option value="">{t("selectOption")}</option>
               {selectOptions.education.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -265,13 +267,13 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
             <input type="number" value={data.graduationYear || ""} onChange={(e) => update("graduationYear", e.target.value)} disabled={readOnly} className="input-field" />
           </FormField>
           <FormField label={t("grade")}>
-            <select value={data.grade || ""} onChange={(e) => update("grade", e.target.value)} disabled={readOnly} className="select-field">
+            <select value={resolveOptionValue(GRADES, data.grade || "")} onChange={(e) => update("grade", e.target.value)} disabled={readOnly} className="select-field">
               <option value="">{t("selectOption")}</option>
               {selectOptions.grade.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </FormField>
           <FormField label={t("militaryStatus")}>
-            <select value={data.militaryStatus || ""} onChange={(e) => update("militaryStatus", e.target.value)} disabled={readOnly} className="select-field">
+            <select value={resolveOptionValue(MILITARY_STATUSES, data.militaryStatus || "")} onChange={(e) => update("militaryStatus", e.target.value)} disabled={readOnly} className="select-field">
               <option value="">{t("selectOption")}</option>
               {selectOptions.militaryStatus.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -409,13 +411,13 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
         <div className="section-header">{t("otherSkills")}</div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
           <FormField label={t("computerProficiency")}>
-            <select value={data.computerProficiency || ""} onChange={(e) => update("computerProficiency", e.target.value)} disabled={readOnly} className="select-field">
+            <select value={resolveOptionValue(PROFICIENCY_LEVELS, data.computerProficiency || "")} onChange={(e) => update("computerProficiency", e.target.value)} disabled={readOnly} className="select-field">
               <option value="">{t("selectOption")}</option>
               {selectOptions.proficiency.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </FormField>
           <FormField label={t("englishProficiency")}>
-            <select value={data.englishProficiency || ""} onChange={(e) => update("englishProficiency", e.target.value)} disabled={readOnly} className="select-field">
+            <select value={resolveOptionValue(PROFICIENCY_LEVELS, data.englishProficiency || "")} onChange={(e) => update("englishProficiency", e.target.value)} disabled={readOnly} className="select-field">
               <option value="">{t("selectOption")}</option>
               {selectOptions.proficiency.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>

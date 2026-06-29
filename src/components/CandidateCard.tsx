@@ -4,6 +4,9 @@ import Link from "next/link";
 import type { Candidate } from "@/lib/types";
 import { useLanguage } from "./LanguageProvider";
 import { getStatusLabel } from "@/lib/i18n";
+import { resolveOptionLabel } from "@/lib/options-i18n";
+import { EDUCATIONAL_QUALIFICATIONS, EGYPTIAN_GOVERNORATES } from "@/lib/constants";
+import { resolveJobPositionLabel } from "@/lib/jobs";
 import { User, Phone, Briefcase, GraduationCap, Calendar, MapPin } from "lucide-react";
 
 interface CandidateCardProps {
@@ -49,7 +52,7 @@ export function CandidateCard({ candidate, index = 0 }: CandidateCardProps) {
       <div className="space-y-2 text-sm text-gray-600">
         <div className="flex items-center gap-2">
           <Briefcase className="h-4 w-4 text-lotus-lime shrink-0" />
-          <span className="truncate">{candidate.positionAppliedFor}</span>
+          <span className="truncate">{resolveJobPositionLabel(locale, candidate.positionAppliedFor)}</span>
         </div>
         {candidate.mobile1 && (
           <div className="flex items-center gap-2">
@@ -60,13 +63,13 @@ export function CandidateCard({ candidate, index = 0 }: CandidateCardProps) {
         {candidate.educationalQualification && (
           <div className="flex items-center gap-2">
             <GraduationCap className="h-4 w-4 text-lotus-lime shrink-0" />
-            <span className="truncate">{candidate.educationalQualification}</span>
+            <span className="truncate">{resolveOptionLabel(locale, EDUCATIONAL_QUALIFICATIONS, candidate.educationalQualification)}</span>
           </div>
         )}
         {candidate.governorate && (
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4 text-lotus-lime shrink-0" />
-            <span>{candidate.governorate}</span>
+            <span>{resolveOptionLabel(locale, EGYPTIAN_GOVERNORATES, candidate.governorate)}</span>
           </div>
         )}
         <div className="flex items-center gap-2">

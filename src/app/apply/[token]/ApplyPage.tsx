@@ -85,7 +85,10 @@ export default function ApplyPage({ token }: { token: string }) {
     const Icon = err.icon;
 
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 relative">
+        <div className="absolute top-5 end-5">
+          <LanguageSwitcher variant="light" />
+        </div>
         <div className="text-center animate-scale-in max-w-md">
           <div className="rounded-2xl bg-white p-8 shadow-lg border border-gray-100">
             <Icon className="h-16 w-16 text-red-400 mx-auto mb-4" />
@@ -99,7 +102,10 @@ export default function ApplyPage({ token }: { token: string }) {
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 relative">
+        <div className="absolute top-5 end-5">
+          <LanguageSwitcher variant="light" />
+        </div>
         <div className="text-center animate-scale-in max-w-md">
           <div className="rounded-2xl bg-white p-8 shadow-lg border border-gray-100">
             <CheckCircle className="h-16 w-16 text-lotus-lime mx-auto mb-4" />
@@ -125,7 +131,7 @@ export default function ApplyPage({ token }: { token: string }) {
               <p className="text-white/70 text-xs">{t("lotusPharmacies")}</p>
             </div>
           </div>
-          <LanguageSwitcher />
+          <LanguageSwitcher variant="dark" />
         </div>
       </header>
 
