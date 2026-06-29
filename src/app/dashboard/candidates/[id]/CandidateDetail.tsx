@@ -5,27 +5,29 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/components/LanguageProvider";
 import { ApplicationForm } from "@/components/ApplicationForm";
-import type { Candidate, UserRole } from "@/lib/types";
-import { hasPermission } from "@/lib/constants";
+import type { Candidate, Permission } from "@/lib/types";
+import { hasSessionPermission } from "@/lib/constants";
 import { CANDIDATE_STATUSES } from "@/lib/constants";
 import { getStatusLabel } from "@/lib/i18n";
 import { ArrowLeft, Save, Trash2, Printer } from "lucide-react";
 
 interface CandidateDetailProps {
   candidate: Candidate;
-  userRole: UserRole;
+  userPermissions: Permission[];
+  userRole: "admin" | "hr" | "viewer";
 }
 
-export function CandidateDetail({ candidate: initial, userRole }: CandidateDetailProps) {
+export function CandidateDetail({ candidate: initial, userPermissions, userRole }: CandidateDetailProps) {
   const { t, locale } = useLanguage();
   const router = useRouter();
   const [candidate, setCandidate] = useState(initial);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const canEdit = hasPermission(userRole, "edit_candidates");
-  const canDelete = hasPermission(userRole, "delete_candidates");
-  const canEditInterviews = hasPermission(userRole, "edit_interviews");
+  const sessionLike = { role: userRole, permissions: userPermissions };
+  const canEdit = hasSessionPermission(sessionLike, "edit_candidates");
+  const canDelete = hasSessionPermission(sessionLike, "delete_candidates");
+  const canEditInterviews = hasSessionPermission(sessionLike, "edit_interviews");
 
   async function handleSave() {
     setSaving(true);

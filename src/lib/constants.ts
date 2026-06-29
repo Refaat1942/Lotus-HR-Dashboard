@@ -1,3 +1,5 @@
+import type { Permission } from "./types";
+
 export const EGYPTIAN_GOVERNORATES = [
   { ar: "القاهرة", en: "Cairo" },
   { ar: "الجيزة", en: "Giza" },
@@ -88,15 +90,86 @@ export const CANDIDATE_STATUSES = [
 ];
 
 export const ROLE_PERMISSIONS = {
-  admin: ["view_candidates", "edit_candidates", "delete_candidates", "manage_users", "create_links", "edit_interviews", "manage_settings", "view_reports"],
-  hr: ["view_candidates", "edit_candidates", "create_links", "edit_interviews", "manage_settings", "view_reports"],
+  admin: ["view_candidates", "edit_candidates", "delete_candidates", "manage_users", "create_links", "delete_links", "edit_interviews", "manage_settings", "view_reports"],
+  hr: ["view_candidates", "edit_candidates", "create_links", "delete_links", "edit_interviews", "manage_settings", "view_reports"],
   viewer: ["view_candidates", "view_reports"],
 } as const;
 
-export type Permission = (typeof ROLE_PERMISSIONS)[keyof typeof ROLE_PERMISSIONS][number];
+export const PERMISSION_GROUPS: {
+  id: string;
+  labelKey: string;
+  permissions: { id: Permission; labelKey: string }[];
+}[] = [
+  {
+    id: "candidates",
+    labelKey: "candidates",
+    permissions: [
+      { id: "view_candidates", labelKey: "permViewCandidates" },
+      { id: "edit_candidates", labelKey: "permEditCandidates" },
+      { id: "delete_candidates", labelKey: "permDeleteCandidates" },
+    ],
+  },
+  {
+    id: "links",
+    labelKey: "inviteLinks",
+    permissions: [
+      { id: "create_links", labelKey: "permCreateLinks" },
+      { id: "delete_links", labelKey: "permDeleteLinks" },
+    ],
+  },
+  {
+    id: "interviews",
+    labelKey: "interviews",
+    permissions: [{ id: "edit_interviews", labelKey: "permEditInterviews" }],
+  },
+  {
+    id: "reports",
+    labelKey: "reports",
+    permissions: [{ id: "view_reports", labelKey: "permViewReports" }],
+  },
+  {
+    id: "settings",
+    labelKey: "settings",
+    permissions: [{ id: "manage_settings", labelKey: "permManageSettings" }],
+  },
+  {
+    id: "users",
+    labelKey: "users",
+    permissions: [{ id: "manage_users", labelKey: "permManageUsers" }],
+  },
+];
 
-export function hasPermission(role: keyof typeof ROLE_PERMISSIONS, permission: Permission): boolean {
+export const ALL_PERMISSIONS = PERMISSION_GROUPS.flatMap((g) => g.permissions.map((p) => p.id));
+
+export function getEffectivePermissions(user: {
+  role: keyof typeof ROLE_PERMISSIONS;
+  customPermissions?: Permission[] | null;
+}): Permission[] {
+  if (user.customPermissions && user.customPermissions.length > 0) {
+    return user.customPermissions;
+  }
+  return [...ROLE_PERMISSIONS[user.role]] as Permission[];
+}
+
+export function hasPermission(
+  role: keyof typeof ROLE_PERMISSIONS,
+  permission: Permission,
+  customPermissions?: Permission[] | null
+): boolean {
+  if (customPermissions && customPermissions.length > 0) {
+    return customPermissions.includes(permission);
+  }
   return (ROLE_PERMISSIONS[role] as readonly string[]).includes(permission);
+}
+
+export function hasSessionPermission(
+  session: { role: keyof typeof ROLE_PERMISSIONS; permissions?: Permission[] },
+  permission: Permission
+): boolean {
+  if (session.permissions && session.permissions.length > 0) {
+    return session.permissions.includes(permission);
+  }
+  return hasPermission(session.role, permission);
 }
 
 export function emptyJobOffer() {

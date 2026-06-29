@@ -2,8 +2,8 @@ import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import fs from "fs";
-import type { Candidate, InviteLink, User, UserRole, AppSettings, BrandingSettings } from "./types";
-import { createEmptyCandidate, emptyJobOffer, emptyExamScores } from "./constants";
+import type { Candidate, InviteLink, User, UserRole, AppSettings, BrandingSettings, Permission } from "./types";
+import { createEmptyCandidate, emptyJobOffer, emptyExamScores, getEffectivePermissions } from "./constants";
 import { defaultFieldVisibility, mergeFieldVisibility } from "./fieldConfig";
 import { defaultBranding } from "./branding";
 
@@ -28,6 +28,7 @@ function defaultDb(): DbSchema {
         role: "admin",
         nameAr: "مدير النظام",
         nameEn: "System Admin",
+        customPermissions: null,
         createdAt: new Date().toISOString(),
       },
     ],
@@ -77,6 +78,14 @@ function ensureDbIntegrity(db: DbSchema): DbSchema {
     return normalized;
   });
 
+  db.users = db.users.map((u) => {
+    if (u.customPermissions === undefined) {
+      changed = true;
+      return { ...u, customPermissions: null };
+    }
+    return u;
+  });
+
   if (changed) writeDb(db);
   return db;
 }
@@ -93,6 +102,7 @@ function ensureDefaultAdmin(db: DbSchema): DbSchema {
       role: "admin",
       nameAr: "مدير النظام",
       nameEn: "System Admin",
+      customPermissions: null,
       createdAt: new Date().toISOString(),
     });
     writeDb(db);
@@ -139,7 +149,14 @@ export function getAllUsers(): Omit<User, "passwordHash">[] {
   return db.users.map(({ passwordHash: _, ...user }) => user);
 }
 
-export function createUser(username: string, password: string, role: UserRole, nameAr: string, nameEn: string): User {
+export function createUser(
+  username: string,
+  password: string,
+  role: UserRole,
+  nameAr: string,
+  nameEn: string,
+  customPermissions: Permission[] | null = null
+): User {
   const db = readDb();
   if (db.users.some((u) => u.username === username)) {
     throw new Error("Username already exists");
@@ -152,11 +169,59 @@ export function createUser(username: string, password: string, role: UserRole, n
     role,
     nameAr,
     nameEn,
+    customPermissions,
     createdAt: new Date().toISOString(),
   };
   db.users.push(user);
   writeDb(db);
   return user;
+}
+
+export function updateUser(
+  id: string,
+  updates: {
+    username?: string;
+    role?: UserRole;
+    nameAr?: string;
+    nameEn?: string;
+    customPermissions?: Permission[] | null;
+    password?: string;
+  }
+): Omit<User, "passwordHash"> | null {
+  const db = readDb();
+  const index = db.users.findIndex((u) => u.id === id);
+  if (index === -1) return null;
+
+  const user = db.users[index];
+  if (user.username === "admin" && updates.role && updates.role !== "admin") {
+    return null;
+  }
+
+  if (updates.username && updates.username !== user.username) {
+    if (db.users.some((u) => u.username === updates.username && u.id !== id)) {
+      throw new Error("Username already exists");
+    }
+  }
+
+  const updated: User = {
+    ...user,
+    username: updates.username ?? user.username,
+    role: updates.role ?? user.role,
+    nameAr: updates.nameAr ?? user.nameAr,
+    nameEn: updates.nameEn ?? user.nameEn,
+    customPermissions:
+      updates.customPermissions !== undefined ? updates.customPermissions : user.customPermissions,
+  };
+
+  if (updates.password) {
+    updated.passwordHash = bcrypt.hashSync(updates.password, 10);
+  }
+
+  db.users[index] = updated;
+  writeDb(db);
+
+  const { passwordHash: _, ...safe } = updated;
+  return safe;
 }
 
 export function deleteUser(id: string): boolean {
@@ -236,14 +301,13 @@ export function submitCandidateApplication(id: string, data: Partial<Candidate>)
 }
 
 // Invite Links
-export function createInviteLink(positionAppliedFor: string, createdBy: string, expiresInDays?: number): InviteLink {
+export function createInviteLink(positionAppliedFor: string, createdBy: string, expiresInDays: number = 3): InviteLink {
+  const days = [1, 2, 3].includes(expiresInDays) ? expiresInDays : 3;
   const db = readDb();
   const id = uuidv4();
   const token = uuidv4();
   const now = new Date().toISOString();
-  const expiresAt = expiresInDays
-    ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000).toISOString()
-    : null;
+  const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
 
   const link: InviteLink = {
     id,
@@ -273,6 +337,22 @@ export function getAllInviteLinks(): InviteLink[] {
   return [...db.inviteLinks].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
+}
+
+export function deleteInviteLink(id: string): boolean {
+  const db = readDb();
+  const link = db.inviteLinks.find((l) => l.id === id);
+  if (!link) return false;
+
+  db.inviteLinks = db.inviteLinks.filter((l) => l.id !== id);
+
+  const candidate = db.candidates.find((c) => c.inviteToken === link.token);
+  if (candidate && candidate.status === "pending") {
+    db.candidates = db.candidates.filter((c) => c.id !== candidate.id);
+  }
+
+  writeDb(db);
+  return true;
 }
 
 export function markInviteLinkUsed(token: string, candidateId: string): void {

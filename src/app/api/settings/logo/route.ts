@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { getSession } from "@/lib/auth";
 import { updateBranding } from "@/lib/db";
-import { hasPermission } from "@/lib/constants";
+import { hasSessionPermission } from "@/lib/constants";
 import {
   ALLOWED_LOGO_TYPES,
   MAX_LOGO_SIZE,
@@ -19,7 +19,7 @@ export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   const session = await getSession();
-  if (!session || !hasPermission(session.role, "manage_settings")) {
+  if (!session || !hasSessionPermission(session, "manage_settings")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE() {
   const session = await getSession();
-  if (!session || !hasPermission(session.role, "manage_settings")) {
+  if (!session || !hasSessionPermission(session, "manage_settings")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 

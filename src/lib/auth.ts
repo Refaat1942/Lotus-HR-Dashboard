@@ -1,6 +1,8 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import type { SessionUser } from "./types";
+import { getUserById } from "./db";
+import { getEffectivePermissions } from "./constants";
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "lotus-hr-dashboard-secret-key-2026"
@@ -29,7 +31,18 @@ export async function getSession(): Promise<SessionUser | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;
-  return verifySession(token);
+
+  const session = await verifySession(token);
+  if (!session) return null;
+
+  if (!session.permissions || session.permissions.length === 0) {
+    const user = getUserById(session.id);
+    if (user) {
+      session.permissions = getEffectivePermissions(user);
+    }
+  }
+
+  return session;
 }
 
 export { COOKIE_NAME };

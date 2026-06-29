@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { getCandidateById } from "@/lib/db";
+import { getEffectivePermissions } from "@/lib/constants";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { CandidateDetail } from "./CandidateDetail";
 
@@ -14,7 +15,11 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
 
   return (
     <DashboardLayout user={session}>
-      <CandidateDetail candidate={candidate} userRole={session.role} />
+      <CandidateDetail
+        candidate={candidate}
+        userRole={session.role}
+        userPermissions={session.permissions ?? getEffectivePermissions({ role: session.role })}
+      />
     </DashboardLayout>
   );
 }

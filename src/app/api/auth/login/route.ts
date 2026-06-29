@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyPassword } from "@/lib/db";
 import { createSession, COOKIE_NAME } from "@/lib/auth";
+import { getEffectivePermissions } from "@/lib/constants";
 
 export const runtime = "nodejs";
 
@@ -31,12 +32,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
+    const permissions = getEffectivePermissions(user);
+
     const token = await createSession({
       id: user.id,
       username: user.username,
       role: user.role,
       nameAr: user.nameAr,
       nameEn: user.nameEn,
+      permissions,
     });
 
     const response = NextResponse.json({
@@ -46,6 +50,7 @@ export async function POST(request: NextRequest) {
         role: user.role,
         nameAr: user.nameAr,
         nameEn: user.nameEn,
+        permissions,
       },
     });
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { createInviteLink, getAllInviteLinks } from "@/lib/db";
-import { hasPermission } from "@/lib/constants";
+import { hasSessionPermission } from "@/lib/constants";
 
 export async function GET() {
   const session = await getSession();
@@ -15,7 +15,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const session = await getSession();
-  if (!session || !hasPermission(session.role, "create_links")) {
+  if (!session || !hasSessionPermission(session, "create_links")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 

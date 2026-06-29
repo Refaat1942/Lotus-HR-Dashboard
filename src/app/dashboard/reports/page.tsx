@@ -1,14 +1,14 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { getReportData } from "@/lib/db";
-import { hasPermission } from "@/lib/constants";
+import { hasSessionPermission } from "@/lib/constants";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ReportsPage } from "./ReportsPage";
 
 export default async function ReportsRoute() {
   const session = await getSession();
   if (!session) redirect("/login");
-  if (!hasPermission(session.role, "view_reports")) redirect("/dashboard");
+  if (!hasSessionPermission(session, "view_reports")) redirect("/dashboard");
 
   const data = getReportData();
 

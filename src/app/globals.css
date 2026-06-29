@@ -50,6 +50,10 @@
     animation: pulseSoft 2s ease-in-out infinite;
   }
 
+  .logo-animated {
+    animation: logoFloat 3s ease-in-out infinite;
+  }
+
   .stagger-1 { animation-delay: 0.05s; }
   .stagger-2 { animation-delay: 0.1s; }
   .stagger-3 { animation-delay: 0.15s; }
@@ -81,6 +85,11 @@
 @keyframes pulseSoft {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.04) translateY(-4px); }
 }
 
 .card-hover {

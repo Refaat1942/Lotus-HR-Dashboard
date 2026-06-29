@@ -120,11 +120,6 @@ export function ReportsPage({ data }: ReportsPageProps) {
           </table>
         </div>
       </div>
-
-      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800 print:hidden">
-        <p className="font-medium">{t("databaseInfo")}</p>
-        <p className="mt-1">{t("databaseDesc")}</p>
-      </div>
     </div>
   );
 }

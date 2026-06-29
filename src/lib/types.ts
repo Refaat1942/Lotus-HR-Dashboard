@@ -1,5 +1,16 @@
 export type UserRole = "admin" | "hr" | "viewer";
 
+export type Permission =
+  | "view_candidates"
+  | "edit_candidates"
+  | "delete_candidates"
+  | "manage_users"
+  | "create_links"
+  | "delete_links"
+  | "edit_interviews"
+  | "manage_settings"
+  | "view_reports";
+
 export interface User {
   id: string;
   username: string;
@@ -7,6 +18,7 @@ export interface User {
   role: UserRole;
   nameAr: string;
   nameEn: string;
+  customPermissions: Permission[] | null;
   createdAt: string;
 }
 
@@ -147,4 +159,5 @@ export interface SessionUser {
   role: UserRole;
   nameAr: string;
   nameEn: string;
+  permissions: Permission[];
 }

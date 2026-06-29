@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { getCandidateById, updateCandidate, deleteCandidate } from "@/lib/db";
-import { hasPermission } from "@/lib/constants";
+import { hasSessionPermission } from "@/lib/constants";
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -20,7 +20,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
-  if (!session || !hasPermission(session.role, "edit_candidates")) {
+  if (!session || !hasSessionPermission(session, "edit_candidates")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
-  if (!session || !hasPermission(session.role, "delete_candidates")) {
+  if (!session || !hasSessionPermission(session, "delete_candidates")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 

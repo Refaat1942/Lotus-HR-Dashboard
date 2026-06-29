@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import type { SessionUser } from "@/lib/types";
-import { hasPermission } from "@/lib/constants";
+import { hasSessionPermission } from "@/lib/constants";
 
 interface DashboardLayoutProps {
   user: SessionUser;
@@ -33,11 +33,11 @@ export function DashboardLayout({ user, children }: DashboardLayoutProps) {
 
   const navItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard"), show: true },
-    { href: "/dashboard/candidates", icon: UserCircle, label: t("candidates"), show: true },
-    { href: "/dashboard/links", icon: Link2, label: t("inviteLinks"), show: hasPermission(user.role, "create_links") },
-    { href: "/dashboard/reports", icon: BarChart3, label: t("reports"), show: hasPermission(user.role, "view_reports") },
-    { href: "/dashboard/settings", icon: Settings, label: t("settings"), show: hasPermission(user.role, "manage_settings") },
-    { href: "/dashboard/users", icon: Users, label: t("users"), show: hasPermission(user.role, "manage_users") },
+    { href: "/dashboard/candidates", icon: UserCircle, label: t("candidates"), show: hasSessionPermission(user, "view_candidates") },
+    { href: "/dashboard/links", icon: Link2, label: t("inviteLinks"), show: hasSessionPermission(user, "create_links") },
+    { href: "/dashboard/reports", icon: BarChart3, label: t("reports"), show: hasSessionPermission(user, "view_reports") },
+    { href: "/dashboard/settings", icon: Settings, label: t("settings"), show: hasSessionPermission(user, "manage_settings") },
+    { href: "/dashboard/users", icon: Users, label: t("users"), show: hasSessionPermission(user, "manage_users") },
   ];
 
   async function handleLogout() {
@@ -70,8 +70,8 @@ export function DashboardLayout({ user, children }: DashboardLayoutProps) {
       >
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-between p-5 border-b border-white/10">
-            <div className="rounded-lg bg-white p-2">
-              <LotusLogo variant="official" className="h-14 w-auto" width={56} height={56} />
+            <div className="rounded-xl bg-white p-3 logo-animated shadow-md">
+              <LotusLogo variant="official" className="h-20 w-auto" width={80} height={80} />
             </div>
             <button
               onClick={() => setSidebarOpen(false)}

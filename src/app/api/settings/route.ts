@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { getSettings, updateSettings } from "@/lib/db";
-import { hasPermission } from "@/lib/constants";
+import { hasSessionPermission } from "@/lib/constants";
 
 export async function GET() {
   const session = await getSession();
-  if (!session || !hasPermission(session.role, "manage_settings")) {
+  if (!session || !hasSessionPermission(session, "manage_settings")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
   return NextResponse.json({ settings: getSettings() });
@@ -13,7 +13,7 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   const session = await getSession();
-  if (!session || !hasPermission(session.role, "manage_settings")) {
+  if (!session || !hasSessionPermission(session, "manage_settings")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 

@@ -67,8 +67,8 @@ export default function LoginPage() {
         <div className="w-full max-w-[420px]">
           {/* Logo */}
           <div className="mb-8 flex flex-col items-center text-center">
-            <div className="mb-6 rounded-2xl bg-white p-4 shadow-lg">
-              <LotusLogo variant="official" className="h-24 w-auto mx-auto" width={100} height={100} />
+            <div className="mb-6 rounded-2xl bg-white p-5 shadow-lg logo-animated">
+              <LotusLogo variant="official" className="h-32 w-auto mx-auto" width={128} height={128} />
             </div>
             <h1 className="text-2xl font-bold text-white sm:text-3xl">{t("appName")}</h1>
             <p className="mt-2 text-sm text-white/60">{t("appSubtitle")}</p>
