@@ -36,7 +36,7 @@ export function DashboardLayout({ user, children }: DashboardLayoutProps) {
     { href: "/dashboard/candidates", icon: UserCircle, label: t("candidates"), show: true },
     { href: "/dashboard/links", icon: Link2, label: t("inviteLinks"), show: hasPermission(user.role, "create_links") },
     { href: "/dashboard/reports", icon: BarChart3, label: t("reports"), show: hasPermission(user.role, "view_reports") },
-    { href: "/dashboard/settings", icon: Settings, label: t("fieldSettings"), show: hasPermission(user.role, "manage_settings") },
+    { href: "/dashboard/settings", icon: Settings, label: t("settings"), show: hasPermission(user.role, "manage_settings") },
     { href: "/dashboard/users", icon: Users, label: t("users"), show: hasPermission(user.role, "manage_users") },
   ];
 

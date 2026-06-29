@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useBranding } from "./BrandingProvider";
+import { getDefaultLogoSrc } from "@/lib/branding";
 
 interface LotusLogoProps {
   className?: string;
@@ -15,22 +17,10 @@ export function LotusLogo({
   width = 120,
   height = 120,
 }: LotusLogoProps) {
-  const [failed, setFailed] = useState(false);
+  const { getLogoSrc, customLogoUrl, loaded } = useBranding();
+  const [useFallback, setUseFallback] = useState(false);
 
-  const src =
-    variant === "white"
-      ? "/lotus-logo-white.png"
-      : variant === "color"
-        ? "/lotus-logo.png"
-        : "/lotus-logo-official.png";
-
-  if (failed) {
-    return (
-      <div className={`font-bold text-[#083f23] ${className}`} style={{ fontSize: height * 0.2 }}>
-        LOTUS
-      </div>
-    );
-  }
+  const src = useFallback ? getDefaultLogoSrc(variant) : getLogoSrc(variant);
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
@@ -40,8 +30,12 @@ export function LotusLogo({
       width={width}
       height={height}
       className={className}
-      onError={() => setFailed(true)}
-      style={{ objectFit: "contain" }}
+      onError={() => {
+        if (customLogoUrl && !useFallback) {
+          setUseFallback(true);
+        }
+      }}
+      style={{ objectFit: "contain", opacity: loaded ? 1 : 0.7 }}
     />
   );
 }

@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth";
 import { getSettings } from "@/lib/db";
 import { hasPermission } from "@/lib/constants";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { FieldSettings } from "./FieldSettings";
+import { SettingsManager } from "./SettingsManager";
 
 export default async function SettingsPage() {
   const session = await getSession();
@@ -14,7 +14,7 @@ export default async function SettingsPage() {
 
   return (
     <DashboardLayout user={session}>
-      <FieldSettings initialVisibility={settings.fieldVisibility} />
+      <SettingsManager settings={settings} />
     </DashboardLayout>
   );
 }

@@ -39,8 +39,8 @@ export function FieldSettings({ initialVisibility }: FieldSettingsProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">{t("fieldSettings")}</h2>
-        <p className="text-gray-500 mt-1">{t("fieldSettingsDesc")}</p>
+        <h2 className="text-xl font-bold text-gray-900">{t("fieldSettings")}</h2>
+        <p className="text-gray-500 mt-1 text-sm">{t("fieldSettingsDesc")}</p>
       </div>
 
       {FIELD_SECTIONS.map((section) => {

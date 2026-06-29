@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Cairo } from "next/font/google";
 import { LanguageProvider } from "@/components/LanguageProvider";
+import { BrandingProvider } from "@/components/BrandingProvider";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -19,7 +20,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={`${inter.variable} ${cairo.variable} antialiased`}>
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          <BrandingProvider>{children}</BrandingProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

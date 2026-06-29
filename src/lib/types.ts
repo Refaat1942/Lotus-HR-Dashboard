@@ -44,8 +44,15 @@ export interface ExamScores {
   examNotes: string;
 }
 
+export interface BrandingSettings {
+  customLogo: boolean;
+  logoUpdatedAt: string | null;
+  logoMimeType: string | null;
+}
+
 export interface AppSettings {
   fieldVisibility: Record<string, boolean>;
+  branding: BrandingSettings;
 }
 
 export interface InterviewRecord {

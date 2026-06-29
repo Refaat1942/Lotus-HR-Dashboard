@@ -2,9 +2,10 @@ import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import fs from "fs";
-import type { Candidate, InviteLink, User, UserRole, AppSettings } from "./types";
+import type { Candidate, InviteLink, User, UserRole, AppSettings, BrandingSettings } from "./types";
 import { createEmptyCandidate, emptyJobOffer, emptyExamScores } from "./constants";
 import { defaultFieldVisibility, mergeFieldVisibility } from "./fieldConfig";
+import { defaultBranding } from "./branding";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DB_FILE = path.join(DATA_DIR, "db.json");
@@ -32,7 +33,7 @@ function defaultDb(): DbSchema {
     ],
     candidates: [],
     inviteLinks: [],
-    settings: { fieldVisibility: defaultFieldVisibility() },
+    settings: { fieldVisibility: defaultFieldVisibility(), branding: defaultBranding() },
   };
 }
 
@@ -54,10 +55,14 @@ function ensureDbIntegrity(db: DbSchema): DbSchema {
   let changed = false;
 
   if (!db.settings) {
-    db.settings = { fieldVisibility: defaultFieldVisibility() };
+    db.settings = { fieldVisibility: defaultFieldVisibility(), branding: defaultBranding() };
     changed = true;
   } else {
     db.settings.fieldVisibility = mergeFieldVisibility(db.settings.fieldVisibility);
+    if (!db.settings.branding) {
+      db.settings.branding = defaultBranding();
+      changed = true;
+    }
   }
 
   db = ensureDefaultAdmin(db);
@@ -295,19 +300,33 @@ export function getDashboardStats() {
 
 export function getSettings(): AppSettings {
   const db = readDb();
-  return db.settings || { fieldVisibility: defaultFieldVisibility() };
+  return (
+    db.settings || {
+      fieldVisibility: defaultFieldVisibility(),
+      branding: defaultBranding(),
+    }
+  );
 }
 
 export function updateSettings(settings: Partial<AppSettings>): AppSettings {
   const db = readDb();
+  const current = getSettings();
+
   db.settings = {
-    fieldVisibility: mergeFieldVisibility({
-      ...db.settings?.fieldVisibility,
-      ...settings.fieldVisibility,
-    }),
+    fieldVisibility: settings.fieldVisibility
+      ? mergeFieldVisibility({ ...current.fieldVisibility, ...settings.fieldVisibility })
+      : current.fieldVisibility,
+    branding: settings.branding
+      ? { ...current.branding, ...settings.branding }
+      : current.branding,
   };
+
   writeDb(db);
   return db.settings;
+}
+
+export function updateBranding(branding: Partial<BrandingSettings>): AppSettings {
+  return updateSettings({ branding: branding as BrandingSettings });
 }
 
 export function getReportData() {
