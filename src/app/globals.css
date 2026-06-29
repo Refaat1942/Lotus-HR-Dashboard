@@ -100,7 +100,16 @@
 }
 
 .input-field {
-  @apply w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm transition-all duration-200 focus:border-lotus-lime focus:outline-none focus:ring-2 focus:ring-lotus-lime/30;
+  @apply w-full rounded-lg border border-gray-300 bg-white py-2.5 text-sm transition-all duration-200 focus:border-lotus-lime focus:outline-none focus:ring-2 focus:ring-lotus-lime/30;
+  padding-inline: 0.75rem;
+}
+
+.input-field-icon-start {
+  padding-inline-start: 2.75rem;
+}
+
+.input-field-icon-end {
+  padding-inline-end: 2.75rem;
 }
 
 .select-field {

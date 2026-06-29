@@ -66,8 +66,8 @@ export function DashboardLayout({ user, children }: DashboardLayoutProps) {
       >
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-between p-5 border-b border-white/10">
-            <div className="rounded-lg bg-white p-2">
-              <LotusLogo className="h-8" />
+            <div className="rounded-lg bg-white/10 p-2 ring-1 ring-white/20">
+              <LotusLogo variant="white" className="h-8 w-auto" width={140} height={36} />
             </div>
             <button
               onClick={() => setSidebarOpen(false)}

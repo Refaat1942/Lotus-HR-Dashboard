@@ -43,7 +43,38 @@ function readDb(): DbSchema {
     return db;
   }
   const raw = fs.readFileSync(DB_FILE, "utf-8");
-  return JSON.parse(raw) as DbSchema;
+  const db = JSON.parse(raw) as DbSchema;
+  return ensureDefaultAdmin(db);
+}
+
+function ensureDefaultAdmin(db: DbSchema): DbSchema {
+  const adminIndex = db.users.findIndex((u) => u.username === "admin");
+
+  if (adminIndex === -1) {
+    const hash = bcrypt.hashSync("admin", 10);
+    db.users.unshift({
+      id: uuidv4(),
+      username: "admin",
+      passwordHash: hash,
+      role: "admin",
+      nameAr: "مدير النظام",
+      nameEn: "System Admin",
+      createdAt: new Date().toISOString(),
+    });
+    writeDb(db);
+    return db;
+  }
+
+  const admin = db.users[adminIndex];
+  if (!admin.passwordHash || !bcrypt.compareSync("admin", admin.passwordHash)) {
+    db.users[adminIndex] = {
+      ...admin,
+      passwordHash: bcrypt.hashSync("admin", 10),
+    };
+    writeDb(db);
+  }
+
+  return db;
 }
 
 function writeDb(db: DbSchema): void {

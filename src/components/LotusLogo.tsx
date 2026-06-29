@@ -1,21 +1,61 @@
-export function LotusLogo({ className = "h-10" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="30" cy="30" r="24" fill="#8DC63F" opacity="0.2" />
-      <path
-        d="M30 12 C20 12 14 20 14 28 C14 38 22 44 30 48 C38 44 46 38 46 28 C46 20 40 12 30 12Z"
-        fill="#8DC63F"
-      />
-      <path
-        d="M30 18 C24 18 20 24 20 30 C20 36 24 40 30 42 C36 40 40 36 40 30 C40 24 36 18 30 18Z"
-        fill="#083F23"
-      />
-      <text x="62" y="28" fill="#083F23" fontFamily="Cairo, sans-serif" fontSize="22" fontWeight="700">
+"use client";
+
+import { useState } from "react";
+
+interface LotusLogoProps {
+  className?: string;
+  variant?: "color" | "white";
+  width?: number;
+  height?: number;
+}
+
+export function LotusLogo({
+  className = "h-10 w-auto",
+  variant = "color",
+  width = 180,
+  height = 48,
+}: LotusLogoProps) {
+  const [failed, setFailed] = useState(false);
+  const src = variant === "white" ? "/lotus-logo-white.png" : "/lotus-logo.png";
+
+  if (failed) {
+    return (
+      <div
+        className={`flex items-center gap-2 font-bold ${variant === "white" ? "text-white" : "text-[#083f23]"} ${className}`}
+        style={{ fontSize: height * 0.45 }}
+      >
+        <span
+          className="inline-flex items-center justify-center rounded-full"
+          style={{
+            width: height * 0.85,
+            height: height * 0.85,
+            background: variant === "white" ? "#8dc63f" : "#083f23",
+          }}
+        >
+          <span
+            className="rounded-full"
+            style={{
+              width: height * 0.4,
+              height: height * 0.4,
+              background: variant === "white" ? "#083f23" : "#8dc63f",
+            }}
+          />
+        </span>
         Lotus
-      </text>
-      <text x="62" y="46" fill="#8DC63F" fontFamily="Cairo, sans-serif" fontSize="11" fontWeight="500">
-        Pharmacies
-      </text>
-    </svg>
+      </div>
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt="Lotus Pharmacies"
+      width={width}
+      height={height}
+      className={className}
+      onError={() => setFailed(true)}
+      style={{ objectFit: "contain" }}
+    />
   );
 }

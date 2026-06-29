@@ -1,17 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { LotusLogo } from "@/components/LotusLogo";
 import { useLanguage } from "@/components/LanguageProvider";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { Lock, User, AlertCircle } from "lucide-react";
+import { Lock, User, AlertCircle, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const { t } = useLanguage();
-  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +23,8 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        credentials: "same-origin",
+        body: JSON.stringify({ username: username.trim(), password }),
       });
 
       if (!res.ok) {
@@ -32,8 +32,8 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
-      router.refresh();
+      // Full page navigation ensures the session cookie is sent to the server
+      window.location.href = "/dashboard";
     } catch {
       setError(t("loginError"));
     } finally {
@@ -42,48 +42,45 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left panel - branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-lotus-green relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 start-20 h-64 w-64 rounded-full bg-lotus-lime animate-pulse-soft" />
-          <div className="absolute bottom-20 end-20 h-48 w-48 rounded-full bg-lotus-lime animate-pulse-soft" style={{ animationDelay: "1s" }} />
-          <div className="absolute top-1/2 start-1/3 h-32 w-32 rounded-full bg-white/20 animate-pulse-soft" style={{ animationDelay: "0.5s" }} />
-        </div>
-        <div className="relative z-10 flex flex-col items-center justify-center w-full p-12 text-white">
-          <div className="rounded-2xl bg-white p-6 mb-8 animate-scale-in shadow-2xl">
-            <LotusLogo className="h-16" />
-          </div>
-          <h1 className="text-3xl font-bold mb-3 animate-slide-up">{t("appName")}</h1>
-          <p className="text-lg text-white/80 text-center animate-slide-up stagger-2">{t("appSubtitle")}</p>
-          <div className="mt-12 flex items-center gap-2 text-sm text-lotus-lime animate-slide-up stagger-3">
-            <div className="h-2 w-2 rounded-full bg-lotus-lime animate-pulse-soft" />
-            Lotus Pharmacies &copy; 2026
-          </div>
-        </div>
+    <div className="relative min-h-screen overflow-hidden bg-[#083f23]">
+      {/* Background decoration */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-24 -start-24 h-96 w-96 rounded-full bg-[#8dc63f]/10 blur-3xl" />
+        <div className="absolute top-1/3 -end-32 h-80 w-80 rounded-full bg-[#8dc63f]/15 blur-3xl" />
+        <div className="absolute -bottom-32 start-1/4 h-96 w-96 rounded-full bg-white/5 blur-3xl" />
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+            backgroundSize: "32px 32px",
+          }}
+        />
       </div>
 
-      {/* Right panel - login form */}
-      <div className="flex-1 flex flex-col">
-        <div className="flex justify-end p-4">
-          <div className="rounded-lg bg-lotus-green px-1">
-            <LanguageSwitcher />
-          </div>
-        </div>
+      {/* Language switcher */}
+      <div className="absolute top-5 end-5 z-20">
+        <LanguageSwitcher />
+      </div>
 
-        <div className="flex-1 flex items-center justify-center p-8">
-          <div className="w-full max-w-md animate-slide-up">
-            <div className="lg:hidden flex justify-center mb-8">
-              <div className="rounded-xl bg-white p-4 shadow-lg border border-gray-100">
-                <LotusLogo className="h-12" />
-              </div>
+      {/* Main content */}
+      <div className="relative z-10 flex min-h-screen items-center justify-center p-4 sm:p-8">
+        <div className="w-full max-w-[420px]">
+          {/* Logo */}
+          <div className="mb-8 flex flex-col items-center text-center">
+            <div className="mb-6 rounded-2xl bg-white/10 p-5 backdrop-blur-sm ring-1 ring-white/20">
+              <LotusLogo variant="white" className="h-14 w-auto" width={220} height={56} />
             </div>
+            <h1 className="text-2xl font-bold text-white sm:text-3xl">{t("appName")}</h1>
+            <p className="mt-2 text-sm text-white/60">{t("appSubtitle")}</p>
+          </div>
 
-            <h2 className="text-2xl font-bold text-lotus-green mb-2">{t("login")}</h2>
-            <p className="text-gray-500 mb-8">{t("appSubtitle")}</p>
+          {/* Login card */}
+          <div className="rounded-2xl bg-white p-8 shadow-2xl shadow-black/20 ring-1 ring-white/10">
+            <h2 className="mb-1 text-xl font-bold text-[#083f23]">{t("login")}</h2>
+            <p className="mb-6 text-sm text-gray-500">{t("lotusPharmacies")}</p>
 
             {error && (
-              <div className="mb-6 flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700 animate-scale-in">
+              <div className="mb-5 flex items-center gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 {error}
               </div>
@@ -91,37 +88,57 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("username")}</label>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                  {t("username")}
+                </label>
                 <div className="relative">
-                  <User className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <User className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="input-field ps-10"
+                    className="input-field input-field-icon-start"
+                    placeholder={t("username")}
                     required
                     autoFocus
+                    autoComplete="username"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("password")}</label>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                  {t("password")}
+                </label>
                 <div className="relative">
-                  <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Lock className="pointer-events-none absolute start-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="input-field ps-10"
+                    className="input-field input-field-icon-start input-field-icon-end"
+                    placeholder={t("password")}
                     required
+                    autoComplete="current-password"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
 
-              <button type="submit" disabled={loading} className="btn-lotus w-full py-3 text-base">
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-lotus w-full py-3.5 text-base font-semibold rounded-xl"
+              >
                 {loading ? (
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center justify-center gap-2">
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     {t("login")}...
                   </span>
@@ -131,6 +148,10 @@ export default function LoginPage() {
               </button>
             </form>
           </div>
+
+          <p className="mt-6 text-center text-xs text-white/40">
+            Lotus Pharmacies &copy; 2026
+          </p>
         </div>
       </div>
     </div>

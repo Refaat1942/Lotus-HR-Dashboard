@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import { COOKIE_NAME } from "@/lib/auth";
 
 export async function POST() {
+  const secure = process.env.COOKIE_SECURE === "true";
   const response = NextResponse.json({ success: true });
   response.cookies.set(COOKIE_NAME, "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure,
     sameSite: "lax",
     maxAge: 0,
     path: "/",

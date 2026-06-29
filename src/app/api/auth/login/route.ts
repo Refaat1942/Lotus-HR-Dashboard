@@ -2,15 +2,31 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyPassword } from "@/lib/db";
 import { createSession, COOKIE_NAME } from "@/lib/auth";
 
+export const runtime = "nodejs";
+
+function cookieOptions() {
+  // Allow HTTP on VPS (port 16310) — set COOKIE_SECURE=true only when using HTTPS
+  const secure = process.env.COOKIE_SECURE === "true";
+
+  return {
+    httpOnly: true,
+    secure,
+    sameSite: "lax" as const,
+    maxAge: 60 * 60 * 24,
+    path: "/",
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { username, password } = await request.json();
+    const trimmedUsername = String(username || "").trim();
 
-    if (!username || !password) {
+    if (!trimmedUsername || !password) {
       return NextResponse.json({ error: "Missing credentials" }, { status: 400 });
     }
 
-    const user = verifyPassword(username, password);
+    const user = verifyPassword(trimmedUsername, password);
     if (!user) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
@@ -33,16 +49,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    response.cookies.set(COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24,
-      path: "/",
-    });
+    response.cookies.set(COOKIE_NAME, token, cookieOptions());
 
     return response;
-  } catch {
+  } catch (error) {
+    console.error("Login error:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

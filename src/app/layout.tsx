@@ -9,6 +9,10 @@ const cairo = Cairo({ subsets: ["arabic", "latin"], variable: "--font-cairo" });
 export const metadata: Metadata = {
   title: "Lotus HR Dashboard | لوحة تحكم الموارد البشرية",
   description: "Lotus Pharmacies HR Job Application Management System",
+  icons: {
+    icon: "/lotus-logo.png",
+    apple: "/lotus-logo.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
