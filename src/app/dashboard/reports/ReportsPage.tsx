@@ -110,7 +110,7 @@ export function ReportsPage({ data }: ReportsPageProps) {
             <tbody>
               {candidates.map((c) => (
                 <tr key={c.id} className="border-t border-gray-100">
-                  <td className="px-3 py-2">{c.applicationNumber}</td>
+                  <td className="px-3 py-2">{c.applicationNumber || "—"}</td>
                   <td className="px-3 py-2">{c.fullName || t("notSubmitted")}</td>
                   <td className="px-3 py-2">{resolveJobPositionLabel(locale, c.positionAppliedFor)}</td>
                   <td className="px-3 py-2">{getStatusLabel(locale, c.status)}</td>

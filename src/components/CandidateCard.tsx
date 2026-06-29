@@ -41,7 +41,9 @@ export function CandidateCard({ candidate, index = 0 }: CandidateCardProps) {
             <h3 className="font-semibold text-gray-900">
               {candidate.fullName || t("notSubmitted")}
             </h3>
-            <p className="text-xs text-gray-500">{candidate.applicationNumber}</p>
+            <p className="text-xs text-gray-500">
+              {candidate.applicationNumber || t("numberAfterSubmit")}
+            </p>
           </div>
         </div>
         <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusColors[candidate.status]}`}>

@@ -78,7 +78,7 @@ function ensureDbIntegrity(db: DbSchema): DbSchema {
     };
     if (!c.jobOffer || !c.examScores) changed = true;
 
-    const withOptions = normalizeOptionFields(
+    let withOptions = normalizeOptionFields(
       normalized,
       CANDIDATE_OPTION_FIELDS.map((f) => ({ key: f.key, options: f.options }))
     );
@@ -87,6 +87,10 @@ function ensureDbIntegrity(db: DbSchema): DbSchema {
     if (position !== withOptions.positionAppliedFor) changed = true;
     if (withOptions.decisionReason === undefined) changed = true;
     if (withOptions.decidedAt === undefined) changed = true;
+    if (withOptions.status === "pending" && withOptions.applicationNumber) {
+      changed = true;
+      withOptions = { ...withOptions, applicationNumber: "" };
+    }
 
     return {
       ...withOptions,
@@ -157,7 +161,15 @@ function writeDb(db: DbSchema): void {
 
 function generateApplicationNumber(db: DbSchema): string {
   const year = new Date().getFullYear();
-  return `LOT-${year}-${String(db.candidates.length + 1).padStart(5, "0")}`;
+  const prefix = `LOT-${year}-`;
+
+  const maxSerial = db.candidates.reduce((max, c) => {
+    if (!c.submittedAt || !c.applicationNumber.startsWith(prefix)) return max;
+    const serial = parseInt(c.applicationNumber.slice(prefix.length), 10);
+    return Number.isFinite(serial) ? Math.max(max, serial) : max;
+  }, 0);
+
+  return `${prefix}${String(maxSerial + 1).padStart(5, "0")}`;
 }
 
 // Users
@@ -287,10 +299,9 @@ export function getCandidateByToken(token: string): Candidate | null {
 export function createCandidateForInvite(positionAppliedFor: string, token: string): Candidate {
   const db = readDb();
   const id = uuidv4();
-  const appNumber = generateApplicationNumber(db);
   const now = new Date().toISOString();
   const candidate = {
-    ...createEmptyCandidate(id, appNumber, positionAppliedFor, token),
+    ...createEmptyCandidate(id, "", positionAppliedFor, token),
     createdAt: now,
     updatedAt: now,
   };
@@ -318,9 +329,21 @@ export function deleteCandidate(id: string): boolean {
 }
 
 export function submitCandidateApplication(id: string, data: Partial<Candidate>): Candidate | null {
+  const db = readDb();
+  const existing = db.candidates.find((c) => c.id === id);
+  if (!existing) return null;
+
   const now = new Date().toISOString();
+  const hasValidNumber = /^LOT-\d{4}-\d{5}$/.test(existing.applicationNumber);
+
+  const applicationNumber =
+    hasValidNumber && existing.submittedAt
+      ? existing.applicationNumber
+      : generateApplicationNumber(db);
+
   return updateCandidate(id, {
     ...data,
+    applicationNumber,
     status: "submitted",
     submittedAt: now,
     applicationDate: now.split("T")[0],

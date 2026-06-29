@@ -194,7 +194,7 @@ export function ApplicationForm({ data, onChange, readOnly = false, showHrSectio
           <FormField label={t("applicationNumber")}>
             <input
               type="text"
-              value={data.applicationNumber || ""}
+              value={data.applicationNumber || (readOnly ? t("numberAfterSubmit") : "")}
               disabled
               className="input-field bg-gray-50"
             />

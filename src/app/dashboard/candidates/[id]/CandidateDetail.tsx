@@ -108,7 +108,9 @@ export function CandidateDetail({ candidate: initial, userPermissions, userRole 
           </Link>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">{t("candidateDetails")}</h2>
-            <p className="text-sm text-gray-500">{candidate.applicationNumber}</p>
+            <p className="text-sm text-gray-500">
+              {candidate.applicationNumber || t("numberAfterSubmit")}
+            </p>
           </div>
         </div>
 

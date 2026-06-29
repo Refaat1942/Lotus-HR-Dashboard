@@ -234,6 +234,7 @@ const translations = {
     currentDecision: "القرار الحالي",
     decidedOn: "تاريخ القرار",
     updateDecision: "تحديث القرار",
+    numberAfterSubmit: "يُحدد بعد التقديم",
   },
   en: {
     appName: "Lotus - HR",
@@ -466,6 +467,7 @@ const translations = {
     currentDecision: "Current Decision",
     decidedOn: "Decision Date",
     updateDecision: "Update Decision",
+    numberAfterSubmit: "Assigned after submission",
   },
 } as const;
 
