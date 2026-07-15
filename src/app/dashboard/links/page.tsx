@@ -4,6 +4,7 @@ import { getAllInviteLinks } from "@/lib/db";
 import { hasSessionPermission } from "@/lib/constants";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { LinksManager } from "./LinksManager";
+import { ReceptionQrPanel } from "./ReceptionQrPanel";
 
 export default async function LinksPage() {
   const session = await getSession();
@@ -15,7 +16,10 @@ export default async function LinksPage() {
 
   return (
     <DashboardLayout user={session}>
-      <LinksManager initialLinks={links} canDelete={canDelete} />
+      <div className="space-y-8">
+        <ReceptionQrPanel />
+        <LinksManager initialLinks={links} canDelete={canDelete} />
+      </div>
     </DashboardLayout>
   );
 }

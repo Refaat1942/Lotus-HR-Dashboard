@@ -13,6 +13,7 @@ services:
       - COOKIE_SECURE=false
     volumes:
       - lotus-hr-data:/app/data
+    # Database: /app/data/db.json | Backups: /app/data/backups/ (auto every 24h)
 
 volumes:
   lotus-hr-data:

@@ -132,3 +132,19 @@
 .form-section {
   @apply rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden;
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #reception-qr-print,
+  #reception-qr-print * {
+    visibility: visible;
+  }
+  #reception-qr-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}

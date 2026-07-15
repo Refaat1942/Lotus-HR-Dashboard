@@ -5,7 +5,8 @@ import { useLanguage } from "@/components/LanguageProvider";
 import type { AppSettings } from "@/lib/types";
 import { BrandingSettingsPanel } from "./BrandingSettings";
 import { FieldSettings } from "./FieldSettings";
-import { Palette, SlidersHorizontal } from "lucide-react";
+import { DatabaseSettings } from "./DatabaseSettings";
+import { Palette, SlidersHorizontal, Database } from "lucide-react";
 
 interface SettingsManagerProps {
   settings: AppSettings;
@@ -13,11 +14,12 @@ interface SettingsManagerProps {
 
 export function SettingsManager({ settings }: SettingsManagerProps) {
   const { t } = useLanguage();
-  const [tab, setTab] = useState<"branding" | "fields">("branding");
+  const [tab, setTab] = useState<"branding" | "fields" | "database">("branding");
 
   const tabs = [
     { id: "branding" as const, label: t("branding"), icon: Palette },
     { id: "fields" as const, label: t("fieldSettings"), icon: SlidersHorizontal },
+    { id: "database" as const, label: t("databaseSettings"), icon: Database },
   ];
 
   return (
@@ -47,6 +49,7 @@ export function SettingsManager({ settings }: SettingsManagerProps) {
 
       {tab === "branding" && <BrandingSettingsPanel initialBranding={settings.branding} />}
       {tab === "fields" && <FieldSettings initialVisibility={settings.fieldVisibility} />}
+      {tab === "database" && <DatabaseSettings />}
     </div>
   );
 }
